@@ -8,8 +8,17 @@
 ```
 brew install elixir
 ```
-
 ### create elixir project
 ```
-mix new elixir_example_project
+mix new example
 ```
+
+### install phoenix
+```
+mix archive.install hex phx_new
+```
+### create elixir project
+```
+mix phx.new demo --live
+```
+

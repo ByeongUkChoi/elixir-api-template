@@ -3,8 +3,13 @@
 - elixir
 - phoenix framework
 
-## Install
+## Installation
 ### install elixir for mac
 ```
 brew install elixir
+```
+
+### create elixir project
+```
+mix new elixir_example_project
 ```

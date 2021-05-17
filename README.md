@@ -3,6 +3,20 @@
 - elixir
 - phoenix framework
 
+## run
+### application (development)
+```
+iex -S mix phx.server
+```
+### database
+```
+docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
+docker exec -it postgres
+psql -U postgres
+CREATE DATABASE blog_dev;
+```
+
+---
 ## Elixir Project
 ### install elixir for mac
 ```

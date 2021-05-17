@@ -1,11 +1,11 @@
-defmodule BlogAppWeb.Router do
-  use BlogAppWeb, :router
+defmodule BlogWeb.Router do
+  use BlogWeb, :router
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/api", BlogAppWeb do
+  scope "/api", BlogWeb do
     pipe_through :api
   end
 
@@ -21,7 +21,7 @@ defmodule BlogAppWeb.Router do
 
     scope "/" do
       pipe_through [:fetch_session, :protect_from_forgery]
-      live_dashboard "/dashboard", metrics: BlogAppWeb.Telemetry
+      live_dashboard "/dashboard", metrics: BlogWeb.Telemetry
     end
   end
 end

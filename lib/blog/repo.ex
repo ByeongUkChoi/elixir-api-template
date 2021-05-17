@@ -1,5 +1,5 @@
-defmodule BlogApp.Repo do
+defmodule Blog.Repo do
   use Ecto.Repo,
-    otp_app: :blog_app,
+    otp_app: :blog,
     adapter: Ecto.Adapters.Postgres
 end

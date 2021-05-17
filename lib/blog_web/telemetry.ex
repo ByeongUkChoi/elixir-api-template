@@ -1,4 +1,4 @@
-defmodule BlogAppWeb.Telemetry do
+defmodule BlogWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -31,11 +31,11 @@ defmodule BlogAppWeb.Telemetry do
       ),
 
       # Database Metrics
-      summary("blog_app.repo.query.total_time", unit: {:native, :millisecond}),
-      summary("blog_app.repo.query.decode_time", unit: {:native, :millisecond}),
-      summary("blog_app.repo.query.query_time", unit: {:native, :millisecond}),
-      summary("blog_app.repo.query.queue_time", unit: {:native, :millisecond}),
-      summary("blog_app.repo.query.idle_time", unit: {:native, :millisecond}),
+      summary("blog.repo.query.total_time", unit: {:native, :millisecond}),
+      summary("blog.repo.query.decode_time", unit: {:native, :millisecond}),
+      summary("blog.repo.query.query_time", unit: {:native, :millisecond}),
+      summary("blog.repo.query.queue_time", unit: {:native, :millisecond}),
+      summary("blog.repo.query.idle_time", unit: {:native, :millisecond}),
 
       # VM Metrics
       summary("vm.memory.total", unit: {:byte, :kilobyte}),
@@ -49,7 +49,7 @@ defmodule BlogAppWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {BlogAppWeb, :count_users, []}
+      # {BlogWeb, :count_users, []}
     ]
   end
 end

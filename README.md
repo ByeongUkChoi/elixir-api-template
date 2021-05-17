@@ -62,6 +62,11 @@ mix phx.new demo --no-html --no-webpack
 ```
 iex -S mix phx.server
 ```
+### generate json resource
+```
+mix phx.gen.json Posts Post posts title:string content:string authorId:integer createdAt:datetime
+```
+
 
 ---
 

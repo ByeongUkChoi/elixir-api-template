@@ -1,10 +1,10 @@
 use Mix.Config
 
 # Configure your database
-config :blog, Blog.Repo,
+config :blog_app, BlogApp.Repo,
   username: "postgres",
   password: "postgres",
-  database: "blog_dev",
+  database: "blog_app_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -15,7 +15,7 @@ config :blog, Blog.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :blog, BlogWeb.Endpoint,
+config :blog_app, BlogAppWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,

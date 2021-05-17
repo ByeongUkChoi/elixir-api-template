@@ -65,7 +65,7 @@ iex -S mix phx.server
 
 ---
 
-# Blog
+# BlogApp
 
 To start your Phoenix server:
 

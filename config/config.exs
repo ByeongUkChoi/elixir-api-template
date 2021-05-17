@@ -7,16 +7,16 @@
 # General application configuration
 use Mix.Config
 
-config :blog,
-  ecto_repos: [Blog.Repo]
+config :blog_app,
+  ecto_repos: [BlogApp.Repo]
 
 # Configures the endpoint
-config :blog, BlogWeb.Endpoint,
+config :blog_app, BlogAppWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "oMQ2aPWZbis3BQ/Y+6ausONVHC/H7YUYHX2fXsOGckknna3k8BUNRfGBzMUFaCA4",
-  render_errors: [view: BlogWeb.ErrorView, accepts: ~w(json), layout: false],
-  pubsub_server: Blog.PubSub,
-  live_view: [signing_salt: "VAqqWjrD"]
+  secret_key_base: "SgXH7JOOude1QTK4fIQBlc8r8aPkY/G0sMDNeG/OYzTTzDQMPVVOVJgclUDn9chS",
+  render_errors: [view: BlogAppWeb.ErrorView, accepts: ~w(json), layout: false],
+  pubsub_server: BlogApp.PubSub,
+  live_view: [signing_salt: "cGmgM1HS"]
 
 # Configures Elixir's Logger
 config :logger, :console,

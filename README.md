@@ -40,8 +40,33 @@ mix run
 ```
 mix archive.install hex phx_new
 ```
-### create elixir project
+### create elixir project (useful for APIs)
 ```
-mix phx.new demo --live
+mix phx.new demo --no-html --no-webpack
+```
+### run (development)
+```
+iex -S mix phx.server
 ```
 
+---
+
+# Blog
+
+To start your Phoenix server:
+
+  * Install dependencies with `mix deps.get`
+  * Create and migrate your database with `mix ecto.setup`
+  * Start Phoenix endpoint with `mix phx.server`
+
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+
+Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+
+## Learn more
+
+  * Official website: https://www.phoenixframework.org/
+  * Guides: https://hexdocs.pm/phoenix/overview.html
+  * Docs: https://hexdocs.pm/phoenix
+  * Forum: https://elixirforum.com/c/phoenix-forum
+  * Source: https://github.com/phoenixframework/phoenix

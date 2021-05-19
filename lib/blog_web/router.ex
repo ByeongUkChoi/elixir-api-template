@@ -7,10 +7,9 @@ defmodule BlogWeb.Router do
 
   scope "/api", BlogWeb do
     pipe_through :api
+    resources "/posts", PostController , except: [:new, :edit]
   end
 
-  # TODO: 
-  # resources "/posts", PostController, except: [:new, :edit]
 
   # Enables LiveDashboard only for development
   #

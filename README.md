@@ -48,6 +48,8 @@ iex > recomple
 mix run
 ```
 
+---
+
 ## Phoenix framework Project
 
 ### install phoenix
@@ -65,6 +67,10 @@ iex -S mix phx.server
 ### generate json resource
 ```
 mix phx.gen.json Posts Post posts title:string content:string authorId:integer createdAt:datetime
+```
+### generate context
+```
+mix phx.gen.context Comments Comment comments name:string content:text post_id:references:posts
 ```
 
 

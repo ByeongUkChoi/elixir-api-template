@@ -9,6 +9,9 @@ defmodule BlogWeb.Router do
     pipe_through :api
   end
 
+  # TODO: 
+  # resources "/posts", PostController, except: [:new, :edit]
+
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put

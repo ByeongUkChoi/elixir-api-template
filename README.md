@@ -1,4 +1,37 @@
 # Elixir API server
+
+## 함수형 프로그래밍으로 API 서버 만들기
+
+### 전자결재 서버 만들기
+
+#### 기능
+- 문서를 기안한다.  
+- 문서를 승인/반려/보류 한다.  
+- 문서가 승인/반려 되면 기안자와 결재자들에게 알람이 발송 된다.  
+
+#### 테이블
+
+##### document (문서)
+|column|type|description|
+|------|----|-----------|
+|id|integer|문서 id|
+|title|string|제목|
+|content|string|내용|
+|drafter_id|integer|기안자 id|
+|drafter_opinion|string|기안자 의견|
+|created_at|datetime|생성 시간|
+
+##### approve_lines (결재선)
+|column|type|description|
+|------|----|-----------|
+|id|integer|결재선 id|
+|sequence|integer|순서|
+|approver_id|integer|결재자 id|
+|approve_type|enum|결재 종류 (APPROVE, REJECT, PENDING)|
+|opinion|string|결재 의견|
+|acted_at|datetime|결제 시간|
+
+
 ## spec
 - elixir
 - phoenix framework

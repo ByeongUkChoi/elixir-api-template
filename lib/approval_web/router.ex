@@ -1,15 +1,13 @@
-defmodule BlogWeb.Router do
-  use BlogWeb, :router
+defmodule ApprovalWeb.Router do
+  use ApprovalWeb, :router
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/api", BlogWeb do
+  scope "/api", ApprovalWeb do
     pipe_through :api
-    resources "/posts", PostController , except: [:new, :edit]
   end
-
 
   # Enables LiveDashboard only for development
   #
@@ -23,7 +21,7 @@ defmodule BlogWeb.Router do
 
     scope "/" do
       pipe_through [:fetch_session, :protect_from_forgery]
-      live_dashboard "/dashboard", metrics: BlogWeb.Telemetry
+      live_dashboard "/dashboard", metrics: ApprovalWeb.Telemetry
     end
   end
 end

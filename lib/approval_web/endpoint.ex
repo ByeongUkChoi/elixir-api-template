@@ -1,16 +1,16 @@
-defmodule BlogWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :blog
+defmodule ApprovalWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :approval
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_blog_key",
-    signing_salt: "//tXidCQ"
+    key: "_approval_key",
+    signing_salt: "epPD1COQ"
   ]
 
-  socket "/socket", BlogWeb.UserSocket,
+  socket "/socket", ApprovalWeb.UserSocket,
     websocket: true,
     longpoll: false
 
@@ -22,7 +22,7 @@ defmodule BlogWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :blog,
+    from: :approval,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
@@ -30,7 +30,7 @@ defmodule BlogWeb.Endpoint do
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
     plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :blog
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :approval
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,
@@ -48,5 +48,5 @@ defmodule BlogWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug BlogWeb.Router
+  plug ApprovalWeb.Router
 end

@@ -109,7 +109,7 @@ mix phx.gen.context Comments Comment comments name:string content:text post_id:r
 
 ---
 
-# Blog
+# Approval
 
 To start your Phoenix server:
 

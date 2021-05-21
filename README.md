@@ -1,17 +1,16 @@
 # Elixir API server
 
-## 함수형 프로그래밍으로 API 서버 만들기
+## 함수형 프로그래밍으로 전자결재 API 서버 만들기
 
-### 전자결재 서버 만들기
-
-#### 기능
+### 기능
 - 문서를 기안한다.  
-- 문서를 승인/반려/보류 한다.  
+- 결재자는 자신의 차례에 문서를 승인/반려/보류 할 수 있다.  
+- 문서가 보류 상태이면 다음 결재자로 넘어가지 않는다. 해당 결재자가 승인/반려를 할 수 있다.
 - 문서가 승인/반려 되면 기안자와 결재자들에게 알람이 발송 된다.  
 
-#### 테이블
+### 테이블
 
-##### document (문서)
+#### document (문서)
 |column|type|description|
 |------|----|-----------|
 |id|integer|문서 id|
@@ -21,7 +20,7 @@
 |drafter_opinion|string|기안자 의견|
 |created_at|datetime|생성 시간|
 
-##### approve_lines (결재선)
+#### approve_lines (결재선)
 |column|type|description|
 |------|----|-----------|
 |id|integer|결재선 id|
@@ -29,10 +28,67 @@
 |approver_id|integer|결재자 id|
 |approve_type|enum|결재 종류 (APPROVE, REJECT, PENDING)|
 |opinion|string|결재 의견|
-|acted_at|datetime|결제 시간|
+|received_at|datetime|수신 시간|
+|acted_at|datetime|결재 시간|
+
+### API document
+#### 문서 조회하기
+##### Request
+```http request
+GET /api/documents HTTP/1.1
+```
+##### Response
+```http request
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+{
+    "id": 1,
+    "title": "Leave application"
+    "content": "I want to leave.."
+    "drafterId": 1,
+    "drafterOpinion": "help",
+    "createdAt": "2021-05-22 12:00:00",
+    "approveLines" : [
+      {
+        "sequence": 1,
+        "approverId": 2,
+        "approveType": "APPROVE",
+        "opinion": "go",
+        "receivedAt": "2021-05-22 12:00:00",
+        "actedAt": "2021-05-22 13:10:00"
+      },
+      {
+        "sequence": 2,
+        "approverId": 3,
+        "receivedAt": "2021-05-22 13:10:00",
+      },
+    ]
+}
+
+#### 문서 상신하기
+##### Request
+```http request
+POST /api/documents HTTP/1.1
+Content-type: application/json;charset=utf-8
+```
+#### Response
+```http request
+HTTP/1.1 201 Created
+```
+
+#### 문서 결재하기
+##### Request
+```http request
+PUT /api/documents/{documentId}/{approveType} HTTP/1.1
+Content-type: application/json;charset=utf-8
+```
+#### Response
+```http request
+HTTP/1.1 200 OK
+```
 
 
-## spec
+### spec
 - elixir
 - phoenix framework
 

@@ -34,8 +34,8 @@
 
 ##### generate
 ```
-mix phx.gen.json Documents Document documents id:integer title:string content:string drafterId:integer drafterOpinion:string createdAt:datetime
-mix phx.gen.context ApproveLines ApproveLine approve_lines id:integer sequence:integer approverId:integer approveType:string opinion:string receivedAt:datetime actedAt:datetime documentId:references:documents
+mix phx.gen.json Documents Document documents title:string content:string drafter_id:integer drafter_opinion:string
+mix phx.gen.context ApproveLines ApproveLine approve_lines sequence:integer approver_id:integer approve_type:string opinion:string received_at:datetime acted_at:datetime document_id:references:documents
 ```
 
 ### API document

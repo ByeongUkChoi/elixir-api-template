@@ -30,6 +30,13 @@
 |opinion|string|결재 의견|
 |received_at|datetime|수신 시간|
 |acted_at|datetime|결재 시간|
+|document_id|integer|문서 id|
+
+##### generate
+```
+mix phx.gen.json Documents Document documents id:integer title:string content:string drafterId:integer drafterOpinion:string createdAt:datetime
+mix phx.gen.context ApproveLines ApproveLine approve_lines id:integer sequence:integer approverId:integer approveType:string opinion:string receivedAt:datetime actedAt:datetime documentId:references:documents
+```
 
 ### API document
 #### 문서 조회하기
@@ -102,7 +109,7 @@ iex -S mix phx.server
 docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
 docker exec -it postgres
 psql -U postgres
-CREATE DATABASE blog_dev;
+CREATE DATABASE approval_dev;
 ```
 
 ---

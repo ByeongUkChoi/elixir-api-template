@@ -37,10 +37,20 @@
 mix phx.gen.json Documents Document documents title:string content:string drafter_id:integer drafter_opinion:string
 mix phx.gen.context ApproveLines ApproveLine approve_lines sequence:integer approver_id:integer approve_type:string opinion:string received_at:datetime acted_at:datetime document_id:references:documents
 ```
+##### insert dummy data
+```
+INSERT INTO documents (title, content, drafter_id, drafter_opinion, inserted_at, updated_at) VALUES ('report', 'this is content', 1, 'hello', NOW(), NOW());
+
+INSERT INTO 
+  approve_lines (sequence ,approver_id ,approve_type ,opinion ,received_at ,acted_at ,document_id ,inserted_at, updated_at)
+VALUES 
+  (1, 2, NULL, '', NOW(), NULL, 1, NOW(), NOW()),
+  (2, 3, NULL, '', NULL, NULL, 1, NOW(), NOW());
+```
 
 ### API document
 
-#### 문서 조회하기
+#### 문서 목록 조회하기
 ##### Request
 ```http request
 GET /api/documents HTTP/1.1
@@ -49,14 +59,15 @@ GET /api/documents HTTP/1.1
 ```http request
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-{
+"data": [
+  {
     "id": 1,
-    "title": "Leave application"
-    "content": "I want to leave.."
+    "title": "Leave application",
+    "content": "I want to leave..",
     "drafterId": 1,
     "drafterOpinion": "help",
     "createdAt": "2021-05-22 12:00:00",
-    "approveLines" : [
+    "approveLines": [
       {
         "sequence": 1,
         "approverId": 2,
@@ -71,6 +82,41 @@ Content-Type: application/json;charset=UTF-8
         "receivedAt": "2021-05-22 13:10:00",
       },
     ]
+  }
+]
+```
+
+#### 문서 상세 조회하기
+##### Request
+```http request
+GET /api/documents/{documentId} HTTP/1.1
+```
+##### Response
+```http request
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+{
+  "id": 1,
+  "title": "Leave application"
+  "content": "I want to leave.."
+  "drafterId": 1,
+  "drafterOpinion": "help",
+  "createdAt": "2021-05-22 12:00:00",
+  "approveLines" : [
+    {
+      "sequence": 1,
+      "approverId": 2,
+      "approveType": "APPROVE",
+      "opinion": "go",
+      "receivedAt": "2021-05-22 12:00:00",
+      "actedAt": "2021-05-22 13:10:00"
+    },
+    {
+      "sequence": 2,
+      "approverId": 3,
+      "receivedAt": "2021-05-22 13:10:00",
+    },
+  ]
 }
 ```
 

@@ -7,6 +7,17 @@ defmodule ApprovalWeb.Router do
 
   scope "/api", ApprovalWeb do
     pipe_through :api
+    scope "/documents" do
+      # get documments
+      get "", DocumentController, :index
+      get "/:id", DocumentController, :show
+
+      # draft document
+      post "", DocumentController, :draft
+
+      # approve document
+      put "/:id", DocumentController, :approve
+    end
   end
 
   # Enables LiveDashboard only for development

@@ -39,6 +39,7 @@ mix phx.gen.context ApproveLines ApproveLine approve_lines sequence:integer appr
 ```
 
 ### API document
+
 #### 문서 조회하기
 ##### Request
 ```http request
@@ -71,6 +72,7 @@ Content-Type: application/json;charset=UTF-8
       },
     ]
 }
+```
 
 #### 문서 상신하기
 ##### Request

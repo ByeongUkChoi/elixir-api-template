@@ -99,6 +99,26 @@ HTTP/1.1 200 OK
 - elixir
 - phoenix framework
 
+## debugging (with VSCode)
+1. install  plugin : ElixirLS: Elixir support and debugger
+2. set configuration
+Add task 
+```
+{
+    "configurations": [
+        {
+            "type": "mix_task",
+            "name": "mix (Default task)",
+            "request": "launch",
+            "task": "phx.server",   // <!-- here -->
+            "projectDir": "${workspaceRoot}"
+        },
+    ]
+}
+```
+3. starting debug (F5)
+4. http request
+
 ## run
 ### application (development)
 ```

@@ -4,20 +4,22 @@ defmodule ApprovalWeb.DocumentController do
   alias Approval.Documents
   alias Approval.Documents.Document
 
+  # alias Approval.ApproveLines
+
   alias Approval.Repo
-  alias Approval.Documents.Queries.DocumentIndexQuery
+  # alias Approval.Documents.Queries.DocumentIndexQuery
 
   action_fallback ApprovalWeb.FallbackController
 
   def index(conn, _params) do
-    documents = DocumentIndexQuery.new() |> Repo.all()
-    render(json conn, documents)
-    # documents = Documents.list_documents()
-    # render(conn, "index.json", documents: documents)
+    # documents = DocumentIndexQuery.new() |> Repo.all()
+    # render(json conn, documents)
+    documents = Documents.list_documents()
+    render(conn, "index.json", documents: documents)
   end
 
   def show(conn, %{"id" => id}) do
-    document = Documents.get_document!(id)
+    document = Repo.get!(Document, id) |> Repo.preload(:approve_lines)
     render(conn, "show.json", document: document)
   end
 

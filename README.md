@@ -20,7 +20,7 @@
 |drafter_opinion|string|기안자 의견|
 |created_at|datetime|생성 시간|
 
-#### approve_lines (결재선)
+#### approval_lines (결재선)
 |column|type|description|
 |------|----|-----------|
 |id|integer|결재선 id|

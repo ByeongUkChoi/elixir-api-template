@@ -14,12 +14,12 @@ defmodule ApprovalWeb.DocumentView do
       title: document.title,
       content: document.content,
       drafterId: document.drafter_id,
-      drafterOpinion: "help",
-      createdAt: "2021-05-22 12:00:00",
+      drafterOpinion: document.drafter_opinion,
+      createdAt: document.inserted_at,
       approvalLines: Enum.map(document.approval_lines, fn(approval_line) -> %{
         sequence: approval_line.sequence,
         approverId: approval_line.approver_id,
-        approvalType: approval_line.approve_type,
+        approvalType: approval_line.approval_type,
         opinion: approval_line.opinion,
         receivedAt: approval_line.received_at,
         actedAt: approval_line.acted_at

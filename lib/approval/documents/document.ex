@@ -7,7 +7,7 @@ defmodule Approval.Documents.Document do
     field :drafter_id, :integer
     field :drafter_opinion, :string
     field :title, :string
-    has_many :approve_lines, Approval.ApproveLines.ApproveLine
+    has_many :approval_lines, Approval.ApprovalLines.ApprovalLine
 
     timestamps()
   end

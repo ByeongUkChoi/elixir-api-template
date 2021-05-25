@@ -1,11 +1,11 @@
-defmodule Approval.Repo.Migrations.CreateApproveLines do
+defmodule Approval.Repo.Migrations.CreateApprovalLines do
   use Ecto.Migration
 
   def change do
-    create table(:approve_lines) do
+    create table(:approval_lines) do
       add :sequence, :integer
       add :approver_id, :integer
-      add :approve_type, :string
+      add :approval_type, :string
       add :opinion, :string
       add :received_at, :naive_datetime
       add :acted_at, :naive_datetime
@@ -14,6 +14,6 @@ defmodule Approval.Repo.Migrations.CreateApproveLines do
       timestamps()
     end
 
-    create index(:approve_lines, [:document_id])
+    create index(:approval_lines, [:document_id])
   end
 end

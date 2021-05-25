@@ -35,14 +35,16 @@
 ##### generate
 ```
 mix phx.gen.json Documents Document documents title:string content:string drafter_id:integer drafter_opinion:string
-mix phx.gen.context ApproveLines ApproveLine approve_lines sequence:integer approver_id:integer approve_type:string opinion:string received_at:datetime acted_at:datetime document_id:references:documents
+mix phx.gen.context ApprovalLines ApprovalLine approval_lines sequence:integer approver_id:integer approval_type:string opinion:string received_at:datetime acted_at:datetime document_id:references:documents
+
+mix ecto.migrate
 ```
 ##### insert dummy data
 ```
 INSERT INTO documents (title, content, drafter_id, drafter_opinion, inserted_at, updated_at) VALUES ('report', 'this is content', 1, 'hello', NOW(), NOW());
 
 INSERT INTO 
-  approve_lines (sequence ,approver_id ,approve_type ,opinion ,received_at ,acted_at ,document_id ,inserted_at, updated_at)
+  approval_lines (sequence ,approver_id ,approval_type ,opinion ,received_at ,acted_at ,document_id ,inserted_at, updated_at)
 VALUES 
   (1, 2, NULL, '', NOW(), NULL, 1, NOW(), NOW()),
   (2, 3, NULL, '', NULL, NULL, 1, NOW(), NOW());
@@ -67,11 +69,11 @@ Content-Type: application/json;charset=UTF-8
     "drafterId": 1,
     "drafterOpinion": "help",
     "createdAt": "2021-05-22 12:00:00",
-    "approveLines": [
+    "approvalLines": [
       {
         "sequence": 1,
         "approverId": 2,
-        "approveType": "APPROVE",
+        "approvalType": "APPROVE",
         "opinion": "go",
         "receivedAt": "2021-05-22 12:00:00",
         "actedAt": "2021-05-22 13:10:00"

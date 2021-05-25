@@ -16,13 +16,13 @@ defmodule ApprovalWeb.DocumentView do
       drafterId: document.drafter_id,
       drafterOpinion: "help",
       createdAt: "2021-05-22 12:00:00",
-      approveLines: Enum.map(document.approve_lines, fn(approve_line) -> %{
-        sequence: approve_line.sequence,
-        approverId: approve_line.approver_id,
-        approveType: approve_line.approve_type,
-        opinion: approve_line.opinion,
-        receivedAt: approve_line.received_at,
-        actedAt: approve_line.acted_at
+      approvalLines: Enum.map(document.approval_lines, fn(approval_line) -> %{
+        sequence: approval_line.sequence,
+        approverId: approval_line.approver_id,
+        approvalType: approval_line.approve_type,
+        opinion: approval_line.opinion,
+        receivedAt: approval_line.received_at,
+        actedAt: approval_line.acted_at
       } end)
     }
   end

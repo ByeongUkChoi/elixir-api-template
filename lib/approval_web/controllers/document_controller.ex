@@ -11,11 +11,9 @@ defmodule ApprovalWeb.DocumentController do
 
   action_fallback ApprovalWeb.FallbackController
 
-  def index(conn, _params) do
-    # documents = DocumentIndexQuery.new() |> Repo.all()
-    # render(json conn, documents)
-    documents = Documents.list_documents()
-    render(conn, "index.json", documents: documents)
+  def index(conn, params) do
+    {documents, pagination} = Document |> Repo.paginate(params)
+    render(conn, "index.json", documents: documents, pagination: pagination)
   end
 
   def show(conn, %{"id" => id}) do

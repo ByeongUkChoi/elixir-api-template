@@ -62,12 +62,4 @@ defmodule ApprovalWeb.DocumentController do
       render(conn, "show.json", document: document)
     end
   end
-
-  def delete(conn, %{"id" => id}) do
-    document = Documents.get_document!(id)
-
-    with {:ok, %Document{}} <- Documents.delete_document(document) do
-      send_resp(conn, :no_content, "")
-    end
-  end
 end

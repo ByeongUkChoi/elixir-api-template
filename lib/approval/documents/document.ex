@@ -3,10 +3,10 @@ defmodule Approval.Documents.Document do
   import Ecto.Changeset
 
   schema "documents" do
+    field :title, :string
     field :content, :string
     field :drafter_id, :integer
     field :drafter_opinion, :string
-    field :title, :string
     has_many :approval_lines, Approval.ApprovalLines.ApprovalLine
 
     timestamps()

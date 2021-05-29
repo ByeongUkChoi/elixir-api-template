@@ -81,8 +81,8 @@ Content-Type: application/json;charset=UTF-8
       {
         "sequence": 2,
         "approverId": 3,
-        "receivedAt": "2021-05-22 13:10:00",
-      },
+        "receivedAt": "2021-05-22 13:10:00"
+      }
     ]
   }
 ]
@@ -116,8 +116,8 @@ Content-Type: application/json;charset=UTF-8
     {
       "sequence": 2,
       "approverId": 3,
-      "receivedAt": "2021-05-22 13:10:00",
-    },
+      "receivedAt": "2021-05-22 13:10:00"
+    }
   ]
 }
 ```
@@ -144,8 +144,8 @@ Content-type: application/json;charset=utf-8
     {
       "sequence": 2,
       "approverId": 3,
-      "receivedAt": "2021-05-22 13:10:00",
-    },
+      "receivedAt": "2021-05-22 13:10:00"
+    }
   ]
 }
 ```

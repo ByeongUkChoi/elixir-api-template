@@ -3,15 +3,14 @@ defmodule Approval.ApprovalLines.ApprovalLine do
   import Ecto.Changeset
 
   schema "approval_lines" do
-    field :acted_at, :naive_datetime
-    field :approval_type, :string
+    field :document_id, :id
+    field :sequence, :integer
     field :approver_id, :integer
+    field :approval_type, :string
     field :opinion, :string
     field :received_at, :naive_datetime
-    field :sequence, :integer
-    field :document_id, :id
+    field :acted_at, :naive_datetime
 
-    timestamps()
   end
 
   @doc false

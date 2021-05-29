@@ -108,15 +108,11 @@ Content-Type: application/json;charset=UTF-8
     {
       "sequence": 1,
       "approverId": 2,
-      "approveType": "APPROVE",
-      "opinion": "go",
-      "receivedAt": "2021-05-22 12:00:00",
-      "actedAt": "2021-05-22 13:10:00"
+      "approveType": "APPROVE"
     },
     {
       "sequence": 2,
-      "approverId": 3,
-      "receivedAt": "2021-05-22 13:10:00"
+      "approverId": 3
     }
   ]
 }

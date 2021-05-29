@@ -4,10 +4,10 @@ defmodule ApprovalWeb.DocumentController do
   alias Approval.Documents
   alias Approval.Documents.Document
 
-  # alias Approval.ApproveLines
+  alias Approval.ApprovalLines.ApprovalLine
 
   alias Approval.Repo
-  # alias Approval.Documents.Queries.DocumentIndexQuery
+  alias Ecto.Multi
 
   action_fallback ApprovalWeb.FallbackController
 
@@ -21,10 +21,51 @@ defmodule ApprovalWeb.DocumentController do
     render(conn, "show.json", document: document)
   end
 
-  # TODO: draft document
-  # def draft(conn, %{"document" => document_params}) do
-  def draft(conn, _params) do
-    render(json conn, "TODO:")
+  def draft(conn, params) do
+    # case 1
+    # Repo.transaction(fn ->
+    #   with {:ok, %Document{} = document} <- Repo.insert(%Document{
+    #     title: params["title"],
+    #     content: params["content"],
+    #     drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
+    #     drafter_opinion: params["opinion"],
+    #   }),
+    #   {_approval_lines_count, nil} <- Repo.insert_all(ApprovalLine, Enum.map(params["approveLines"], fn(approve_line) -> %{
+    #       document_id: document.id,
+    #       sequence: approve_line["sequence"],
+    #       approver_id: approve_line["approverId"],
+    #       approval_type: approve_line["approvalType"]
+    #   } end))
+    #   do
+    #     send_resp(conn, :created, document.title)
+    #   end
+    # end)
+
+    Multi.new()
+      |> Multi.insert(:document, %Document{
+        title: params["title"],
+        content: params["content"],
+        drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
+        drafter_opinion: params["opinion"],
+      })
+      |> Multi.merge(fn %{document: document} ->
+        Multi.new()
+        |> Multi.insert_all(:approval_lines_insert_all, ApprovalLine, Enum.map(params["approveLines"], fn(approve_line) -> %{
+          document_id: document.id,
+          sequence: approve_line["sequence"],
+          approver_id: approve_line["approverId"],
+          approval_type: approve_line["approvalType"]
+      } end))
+      end)
+      |> Repo.transaction()
+    send_resp(conn, :created, '')
+  end
+  def draft2(conn, params) do
+    %Document{}
+    |> Document.changeset(params)
+    |> Repo.insert()
+    conn
+    |> put_status(:created)
   end
 
   def create(conn, %{"document" => document_params}) do

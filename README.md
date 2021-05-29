@@ -126,7 +126,28 @@ Content-Type: application/json;charset=UTF-8
 ##### Request
 ```http request
 POST /api/documents HTTP/1.1
+X-USER-ID: 123
 Content-type: application/json;charset=utf-8
+{
+  "title": "Leave application"
+  "content": "I want to leave.."
+  "drafterOpinion": "help",
+  "approveLines" : [
+    {
+      "sequence": 1,
+      "approverId": 2,
+      "approveType": "APPROVE",
+      "opinion": "go",
+      "receivedAt": "2021-05-22 12:00:00",
+      "actedAt": "2021-05-22 13:10:00"
+    },
+    {
+      "sequence": 2,
+      "approverId": 3,
+      "receivedAt": "2021-05-22 13:10:00",
+    },
+  ]
+}
 ```
 #### Response
 ```http request
@@ -137,6 +158,7 @@ HTTP/1.1 201 Created
 ##### Request
 ```http request
 PUT /api/documents/{documentId}/{approveType} HTTP/1.1
+X-USER-ID: 123
 Content-type: application/json;charset=utf-8
 ```
 #### Response

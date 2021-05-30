@@ -16,7 +16,7 @@ defmodule ApprovalWeb.Router do
       post "", DocumentController, :draft
 
       # approve document
-      put "/:id", DocumentController, :approve
+      put "/:id/:approve_type", DocumentController, :approve
     end
   end
 

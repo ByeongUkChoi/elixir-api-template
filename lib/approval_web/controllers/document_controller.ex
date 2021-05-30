@@ -31,13 +31,14 @@ defmodule ApprovalWeb.DocumentController do
     })
     |> Multi.merge(fn %{document: document} ->
       Multi.new()
-      |> Multi.insert_all(:approval_lines_insert_all, ApprovalLine, Enum.map(params["approveLines"], fn(approve_line) -> %{
-        document_id: document.id,
-        sequence: approve_line["sequence"],
-        approver_id: approve_line["approverId"],
-        approval_type: approve_line["approvalType"]
-        # TODO: received_at
-    } end))
+      |> Multi.insert_all(:approval_lines_insert_all, ApprovalLine, Enum.map(params["approveLines"], fn(approve_line) ->
+        %{
+          document_id: document.id,
+          sequence: approve_line["sequence"],
+          approver_id: approve_line["approverId"],
+          received_at: approve_line["sequence"] == 1 && document.inserted_at || nil
+        }
+      end))
     end)
     |> Repo.transaction()
 
@@ -46,6 +47,19 @@ defmodule ApprovalWeb.DocumentController do
     |> show(%{"id" => document.id})
   end
 
+  def approve(conn, %{"id" => id, "approve_type" => "confirm"}) do
+    send_resp(conn, :ok, "confirm : #{id}")
+  end
+
+  def approve(conn, %{"id" => id, "approve_type" => "reject"}) do
+    send_resp(conn, :ok, "reject : #{id}")
+  end
+
+  def approve(conn, %{"id" => id, "approve_type" => "pending"}) do
+    send_resp(conn, :ok, "pending : #{id}")
+  end
+
+  ############
   def create(conn, %{"document" => document_params}) do
     with {:ok, %Document{} = document} <- Documents.create_document(document_params) do
       conn

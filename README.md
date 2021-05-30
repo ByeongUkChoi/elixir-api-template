@@ -26,7 +26,7 @@
 |id|integer|결재선 id|
 |sequence|integer|순서|
 |approver_id|integer|결재자 id|
-|approve_type|enum|결재 종류 (APPROVE, REJECT, PENDING)|
+|approve_type|enum|결재 종류 (CONFIRM, REJECT, PENDING)|
 |opinion|string|결재 의견|
 |received_at|datetime|수신 시간|
 |acted_at|datetime|결재 시간|
@@ -73,7 +73,7 @@ Content-Type: application/json;charset=UTF-8
       {
         "sequence": 1,
         "approverId": 2,
-        "approvalType": "APPROVE",
+        "approvalType": "CONFIRM",
         "opinion": "go",
         "receivedAt": "2021-05-22 12:00:00",
         "actedAt": "2021-05-22 13:10:00"
@@ -108,7 +108,7 @@ Content-Type: application/json;charset=UTF-8
     {
       "sequence": 1,
       "approverId": 2,
-      "approveType": "APPROVE"
+      "approveType": "CONFIRM"
     },
     {
       "sequence": 2,
@@ -132,7 +132,6 @@ Content-type: application/json;charset=utf-8
     {
       "sequence": 1,
       "approverId": 2,
-      "approveType": "APPROVE"
     },
     {
       "sequence": 2,
@@ -153,7 +152,6 @@ Content-type: application/json;charset=utf-8
     {
       "sequence": 1,
       "approverId": 2,
-      "approveType": "APPROVE",
       "receivedAt": "2021-05-22 12:00:00"
     },
     {

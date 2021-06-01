@@ -48,15 +48,35 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def approve(conn, %{"id" => id, "approve_type" => "confirm"}) do
-    send_resp(conn, :ok, "confirm : #{id}")
+    document = get_document_with_approval_lines(id)
+    approver = get_approver(document, get_req_header(conn, "x-user-id") |> hd)
+    # TODO: validate
+    send_resp(conn, :ok, "confirm : #{document.id}, #{approver.id}")
   end
 
   def approve(conn, %{"id" => id, "approve_type" => "reject"}) do
-    send_resp(conn, :ok, "reject : #{id}")
+    document = get_document_with_approval_lines(id)
+    send_resp(conn, :ok, "reject : #{document.id}")
   end
 
   def approve(conn, %{"id" => id, "approve_type" => "pending"}) do
-    send_resp(conn, :ok, "pending : #{id}")
+    document = get_document_with_approval_lines(id)
+    send_resp(conn, :ok, "pending : #{document.id}")
+  end
+
+  defp get_document_with_approval_lines(id) do
+    # TODO exception
+    Document
+    |> Repo.get!(id)
+    |> Repo.preload(:approval_lines)
+  end
+
+  defp get_approver(%Document{} = document, approver_id) do
+    # TODO: return ok:, error:
+    document.approval_lines
+    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and approval_line.acted_at == nil end)
+    |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
+    |> hd
   end
 
   ############

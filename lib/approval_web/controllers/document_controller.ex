@@ -47,11 +47,20 @@ defmodule ApprovalWeb.DocumentController do
     |> show(%{"id" => document.id})
   end
 
-  def approve(conn, %{"id" => id, "approve_type" => "confirm"}) do
+  def approve(conn, %{"id" => id, "approve_type" => "confirm", "opinion" => opinion}) do
     document = get_document_with_approval_lines(id)
-    approver = get_approver(document, get_req_header(conn, "x-user-id") |> hd)
-    # TODO: validate
-    send_resp(conn, :ok, "confirm : #{document.id}, #{approver.id}")
+    approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
+
+    current_approval_line = get_approval_line(document, approver_id)
+    ApprovalLine.changeset(current_approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
+    |> Repo.update()
+    # TODO: Not found next approval line
+    next_approval_line = get_next_approval_line(document, current_approval_line.sequence)
+    ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
+    |> Repo.update()
+    # TODO: transaction
+
+    send_resp(conn, :ok, "confirm : #{document.id}")
   end
 
   def approve(conn, %{"id" => id, "approve_type" => "reject"}) do
@@ -71,11 +80,17 @@ defmodule ApprovalWeb.DocumentController do
     |> Repo.preload(:approval_lines)
   end
 
-  defp get_approver(%Document{} = document, approver_id) do
+  defp get_approval_line(%Document{} = document, approver_id) do
     # TODO: return ok:, error:
     document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.received_at != nil and approval_line.acted_at == nil end)
     |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
+    |> hd
+  end
+  defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
+    # TODO: return ok:, error:
+    document.approval_lines
+    |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
     |> hd
   end
 

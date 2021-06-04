@@ -7,6 +7,7 @@ defmodule Approval.Repo.Migrations.CreateDocuments do
       add :content, :string
       add :drafter_id, :integer
       add :drafter_opinion, :string
+      add :status, :string
 
       timestamps()
     end

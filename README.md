@@ -18,6 +18,7 @@
 |content|string|내용|
 |drafter_id|integer|기안자 id|
 |drafter_opinion|string|기안자 의견|
+|status|string|문서 상태 (ON_PROGRESS,PENDING,CONFIRMED, REJECTED)|
 |created_at|datetime|생성 시간|
 
 #### approval_lines (결재선)
@@ -68,6 +69,7 @@ Content-Type: application/json;charset=UTF-8
     "content": "I want to leave..",
     "drafterId": 1,
     "drafterOpinion": "help",
+    "status": "ON_PROGRESS"
     "createdAt": "2021-05-22 12:00:00",
     "approvalLines": [
       {
@@ -103,6 +105,7 @@ Content-Type: application/json;charset=UTF-8
   "content": "I want to leave.."
   "drafterId": 1,
   "drafterOpinion": "help",
+  "status": "ON_PROGRESS"
   "createdAt": "2021-05-22 12:00:00",
   "approveLines" : [
     {
@@ -148,6 +151,7 @@ Content-type: application/json;charset=utf-8
   "title": "Leave application"
   "content": "I want to leave.."
   "drafterOpinion": "help",
+  "status": "ON_PROGRESS"
   "approveLines" : [
     {
       "sequence": 1,
@@ -168,6 +172,9 @@ Content-type: application/json;charset=utf-8
 PUT /api/documents/{documentId}/{approveType} HTTP/1.1
 X-USER-ID: 123
 Content-type: application/json;charset=utf-8
+{
+  "opinion": "go go !"
+}
 ```
 #### Response
 ```http request

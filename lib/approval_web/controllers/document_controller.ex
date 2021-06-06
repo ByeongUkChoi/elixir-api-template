@@ -62,7 +62,6 @@ defmodule ApprovalWeb.DocumentController do
 
   # TODO: confirm document
   defp confirm(document, approval_line, opinion) do
-    # next_approval_line = get_next_approval_line(document, current_approval_line.sequence)
     ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
     |> Repo.update()
 
@@ -70,17 +69,30 @@ defmodule ApprovalWeb.DocumentController do
     next_approval_line = get_next_approval_line(document, approval_line.sequence)
     ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
     |> Repo.update()
+
+    # TODO: cond next_approval_line
+    Document.changeset(document, %{status: CONFIRMED})
+    # Document.changeset(document, %{status: ON_PROGRESS})
+
     # TODO: transaction
     :ok
   end
 
-  defp reject(conn, approval_line, opinion) do
-    # TODO
+  defp reject(document, approval_line, opinion) do
+    # TODO: transaction
+    ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
+    |> Repo.update()
+
+    Document.changeset(document, %{status: REJECTED})
     :ok
   end
 
-  defp pending(conn, approval_line) do
-    # TODO
+  defp pending(document, approval_line) do
+    # TODO: transaction
+    ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
+    |> Repo.update()
+
+    Document.changeset(document, %{status: PENDING})
     :ok
   end
 
@@ -94,7 +106,8 @@ defmodule ApprovalWeb.DocumentController do
   defp get_approval_line(%Document{} = document, approver_id) do
     # TODO: return ok:, error:
     document.approval_lines
-    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and approval_line.acted_at == nil end)
+    # TODO: pending
+    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approve_type == PENDING) end)
     |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
     |> hd
   end

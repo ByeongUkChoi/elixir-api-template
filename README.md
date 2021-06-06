@@ -4,7 +4,7 @@
 
 ### 기능
 - 문서를 기안한다.  
-- 결재자는 자신의 차례에 문서를 승인/반려/보류 할 수 있다.  
+- 결재자는 자신의 차례에 문서를 승인/반려/보류 할 수 있다.  (반려 시 의견은 필수로 입력해야 한다.)
 - 문서가 보류 상태이면 다음 결재자로 넘어가지 않는다. 해당 결재자가 승인/반려를 할 수 있다.
 - 문서가 승인/반려 되면 기안자와 결재자들에게 알람이 발송 된다.  
 
@@ -45,10 +45,10 @@ mix ecto.migrate
 INSERT INTO documents (title, content, drafter_id, drafter_opinion, inserted_at, updated_at) VALUES ('report', 'this is content', 1, 'hello', NOW(), NOW());
 
 INSERT INTO 
-  approval_lines (sequence ,approver_id ,approval_type ,opinion ,received_at ,acted_at ,document_id ,inserted_at, updated_at)
+  approval_lines (sequence ,approver_id ,approval_type ,opinion ,received_at ,acted_at ,document_id)
 VALUES 
-  (1, 2, NULL, '', NOW(), NULL, 1, NOW(), NOW()),
-  (2, 3, NULL, '', NULL, NULL, 1, NOW(), NOW());
+  (1, 2, NULL, '', NOW(), NULL, 1),
+  (2, 3, NULL, '', NULL, NULL, 1);
 ```
 
 ### API document

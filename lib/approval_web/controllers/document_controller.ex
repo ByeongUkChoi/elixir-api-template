@@ -98,18 +98,19 @@ defmodule ApprovalWeb.DocumentController do
 
   defp get_document_with_approval_lines(id) do
     # TODO exception
-    Document
+    document = Document
     |> Repo.get!(id)
     |> Repo.preload(:approval_lines)
+    # {:ok, document}
+    document
   end
 
   defp get_approval_line(%Document{} = document, approver_id) do
     # TODO: return ok:, error:
     document.approval_lines
-    # TODO: pending
-    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approve_type == PENDING) end)
+    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approval_type == PENDING) end)
     |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
-    |> hd
+    |> List.first()
   end
   defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
     # TODO: return ok:, error:

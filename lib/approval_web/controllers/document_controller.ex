@@ -79,18 +79,20 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   defp reject(document, approval_line, opinion) do
-    # TODO: transaction
-    ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-    |> Repo.update()
+    Repo.transaction(fn ->
+      ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
+      |> Repo.update()
+    end)
 
     Document.changeset(document, %{status: REJECTED})
     :ok
   end
 
   defp pending(document, approval_line) do
-    # TODO: transaction
-    ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
-    |> Repo.update()
+    Repo.transaction(fn ->
+      ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
+      |> Repo.update()
+    end)
 
     Document.changeset(document, %{status: PENDING})
     :ok

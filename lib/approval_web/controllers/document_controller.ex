@@ -48,7 +48,7 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def approve(conn, params)  do
-    document = get_document_with_approval_lines(params["id"])
+    {:ok, document} = get_document_with_approval_lines(params["id"])
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
     approval_line = get_approval_line(document, approver_id)
     case params["approve_type"] do
@@ -73,7 +73,6 @@ defmodule ApprovalWeb.DocumentController do
 
       # TODO: cond next_approval_line
       Document.changeset(document, %{status: CONFIRMED})
-      # Document.changeset(document, %{status: ON_PROGRESS})
     end)
     :ok
   end
@@ -103,8 +102,7 @@ defmodule ApprovalWeb.DocumentController do
     document = Document
     |> Repo.get!(id)
     |> Repo.preload(:approval_lines)
-    # {:ok, document}
-    document
+    {:ok, document}
   end
 
   defp get_approval_line(%Document{} = document, approver_id) do

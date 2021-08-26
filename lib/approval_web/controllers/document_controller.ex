@@ -102,7 +102,11 @@ defmodule ApprovalWeb.DocumentController do
     document = Document
     |> Repo.get!(id)
     |> Repo.preload(:approval_lines)
-    {:ok, document}
+
+    case document do
+      nil -> {:error, nil}
+      _ -> {:ok, document}
+    end
   end
 
   defp get_approval_line(%Document{} = document, approver_id) do
@@ -118,8 +122,11 @@ defmodule ApprovalWeb.DocumentController do
     approval_line = document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
     |> hd
-    # TODO: error
-    {:ok, approval_line}
+
+    case approval_line do
+      nil -> {:error, nil}
+      _ -> {:ok, approval_line}
+    end
   end
 
   ############

@@ -67,7 +67,7 @@ defmodule ApprovalWeb.DocumentController do
       |> Repo.update()
 
       # TODO: Not found next approval line
-      next_approval_line = get_next_approval_line(document, approval_line.sequence)
+      {:ok, next_approval_line} = get_next_approval_line(document, approval_line.sequence)
       ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
       |> Repo.update()
 
@@ -114,11 +114,14 @@ defmodule ApprovalWeb.DocumentController do
     |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
     |> List.first()
   end
+
   defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
     # TODO: return ok:, error:
-    document.approval_lines
+    approval_line = document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
     |> hd
+    # TODO: error
+    {:ok, approval_line}
   end
 
   ############

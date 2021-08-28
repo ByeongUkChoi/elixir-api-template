@@ -17,7 +17,7 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def show(conn, %{"id" => id}) do
-    document = Document |> Repo.get!(id) |> Repo.preload(:approval_lines)
+    document = Documents.get_document_with_approval_lines!(id)
     render(conn, "show.json", document: document)
   end
 

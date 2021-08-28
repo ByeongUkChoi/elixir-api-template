@@ -8,6 +8,8 @@ defmodule Approval.Documents do
 
   alias Approval.Documents.Document
 
+  def get_document_with_approval_lines!(id), do: Repo.get!(Document, id) |> Repo.preload(:approval_lines)
+
   @doc """
   Returns the list of documents.
 
@@ -37,6 +39,10 @@ defmodule Approval.Documents do
   """
   def get_document!(id), do: Repo.get!(Document, id)
 
+  @spec create_document(
+          :invalid
+          | %{optional(:__struct__) => none, optional(atom | binary) => any}
+        ) :: any
   @doc """
   Creates a document.
 

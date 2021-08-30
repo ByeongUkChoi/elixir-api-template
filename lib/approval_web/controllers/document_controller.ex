@@ -64,15 +64,16 @@ defmodule ApprovalWeb.DocumentController do
   defp confirm(document, approval_line, opinion) do
     Repo.transaction(fn ->
       ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-      |> Repo.update()
+      |> Repo.update!()
 
       # TODO: Not found next approval line
       {:ok, next_approval_line} = get_next_approval_line(document, approval_line.sequence)
       ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
-      |> Repo.update()
+      |> Repo.update!()
 
       # TODO: cond next_approval_line
       Document.changeset(document, %{status: CONFIRMED})
+      |> Repo.update!()
     end)
     :ok
   end
@@ -81,9 +82,10 @@ defmodule ApprovalWeb.DocumentController do
     Repo.transaction(fn ->
       ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
       |> Repo.update!()
-    end)
 
-    Document.changeset(document, %{status: REJECTED})
+      Document.changeset(document, %{status: REJECTED})
+      |> Repo.update!()
+    end)
     :ok
   end
 
@@ -91,9 +93,9 @@ defmodule ApprovalWeb.DocumentController do
     Repo.transaction(fn ->
       ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
       |> Repo.update!()
+      Document.changeset(document, %{status: PENDING})
+      |> Repo.update!()
     end)
-
-    Document.changeset(document, %{status: PENDING})
     :ok
   end
 

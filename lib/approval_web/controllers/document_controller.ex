@@ -12,7 +12,7 @@ defmodule ApprovalWeb.DocumentController do
   action_fallback ApprovalWeb.FallbackController
 
   def index(conn, params) do
-    {documents, pagination} = Document |> Repo.paginate(params)
+    {documents, pagination} = Documents.get_document_list(params)
     render(conn, "index.json", documents: documents, pagination: pagination)
   end
 

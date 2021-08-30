@@ -8,7 +8,14 @@ defmodule Approval.Documents do
 
   alias Approval.Documents.Document
 
-  def get_document_with_approval_lines!(id), do: Repo.get!(Document, id) |> Repo.preload(:approval_lines)
+  def get_document_list(params) do
+    Repo.paginate(Document, params)
+  end
+
+  def get_document_with_approval_lines!(id) do
+    Repo.get!(Document, id)
+    |> Repo.preload(:approval_lines)
+  end
 
   @doc """
   Returns the list of documents.

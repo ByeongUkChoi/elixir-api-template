@@ -50,7 +50,7 @@ defmodule ApprovalWeb.DocumentController do
   def approve(conn, params)  do
     {:ok, document} = get_document_with_approval_lines(params["id"])
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
-    approval_line = get_approval_line(document, approver_id)
+    {:ok, approval_line} = get_approval_line(document, approver_id)
     case params["approve_type"] do
       "confirm" -> confirm(document, approval_line, params["opinion"])
       "reject" -> reject(document, approval_line, params["opinion"])
@@ -65,9 +65,7 @@ defmodule ApprovalWeb.DocumentController do
       ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
       |> Repo.update!()
 
-      # TODO: pattern matching
-      {:ok, next_approval_line} = get_next_approval_line(document, approval_line.sequence)
-      if next_approval_line != nil do
+      with {:ok, next_approval_line} <- get_next_approval_line(document, approval_line.sequence) do
         ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
         |> Repo.update!()
       end
@@ -112,11 +110,15 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   defp get_approval_line(%Document{} = document, approver_id) do
-    # TODO: return ok:, error:
-    document.approval_lines
+    approval_line = document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approval_type == PENDING) end)
     |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
     |> List.first()
+
+    case approval_line do
+      nil -> {:error, nil}
+      _ -> {:ok, approval_line}
+    end
   end
 
   defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do

@@ -60,18 +60,18 @@ defmodule ApprovalWeb.DocumentController do
     send_resp(conn, :ok, "success")
   end
 
-  # TODO: confirm document
   defp confirm(document, approval_line, opinion) do
     Repo.transaction(fn ->
       ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
       |> Repo.update!()
 
-      # TODO: Not found next approval line
+      # TODO: pattern matching
       {:ok, next_approval_line} = get_next_approval_line(document, approval_line.sequence)
-      ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
-      |> Repo.update!()
+      if next_approval_line != nil do
+        ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
+        |> Repo.update!()
+      end
 
-      # TODO: cond next_approval_line
       Document.changeset(document, %{status: CONFIRMED})
       |> Repo.update!()
     end)

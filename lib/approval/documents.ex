@@ -17,6 +17,26 @@ defmodule Approval.Documents do
     |> Repo.preload(:approval_lines)
   end
 
+  def get_approval_line!(%Document{} = document, approver_id) do
+    document.approval_lines
+    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approval_type == PENDING) end)
+    |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
+    |> List.first()
+  end
+
+  def get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
+    approval_line = document.approval_lines
+    |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
+    |> hd
+
+    case approval_line do
+      nil -> {:error, nil}
+      _ -> {:ok, approval_line}
+    end
+  end
+
+  ######
+
   @doc """
   Returns the list of documents.
 

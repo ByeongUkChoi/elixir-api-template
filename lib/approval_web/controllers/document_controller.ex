@@ -48,9 +48,9 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def approve(conn, params)  do
-    {:ok, document} = get_document_with_approval_lines(params["id"])
+    document = Documents.get_document_with_approval_lines!(params["id"])
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
-    {:ok, approval_line} = get_approval_line(document, approver_id)
+    approval_line = Documents.get_approval_line!(document, approver_id)
     case params["approve_type"] do
       "confirm" -> confirm(document, approval_line, params["opinion"])
       "reject" -> reject(document, approval_line, params["opinion"])
@@ -65,7 +65,7 @@ defmodule ApprovalWeb.DocumentController do
       ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
       |> Repo.update!()
 
-      with {:ok, next_approval_line} <- get_next_approval_line(document, approval_line.sequence) do
+      with {:ok, next_approval_line} <- Documents.get_next_approval_line(document, approval_line.sequence) do
         ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
         |> Repo.update!()
       end
@@ -95,42 +95,6 @@ defmodule ApprovalWeb.DocumentController do
       |> Repo.update!()
     end)
     :ok
-  end
-
-  defp get_document_with_approval_lines(id) do
-    # TODO exception
-    document = Document
-    |> Repo.get!(id)
-    |> Repo.preload(:approval_lines)
-
-    case document do
-      nil -> {:error, nil}
-      _ -> {:ok, document}
-    end
-  end
-
-  defp get_approval_line(%Document{} = document, approver_id) do
-    approval_line = document.approval_lines
-    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approval_type == PENDING) end)
-    |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
-    |> List.first()
-
-    case approval_line do
-      nil -> {:error, nil}
-      _ -> {:ok, approval_line}
-    end
-  end
-
-  defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
-    # TODO: return ok:, error:
-    approval_line = document.approval_lines
-    |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
-    |> hd
-
-    case approval_line do
-      nil -> {:error, nil}
-      _ -> {:ok, approval_line}
-    end
   end
 
   ############

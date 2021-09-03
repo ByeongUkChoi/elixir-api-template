@@ -1,4 +1,4 @@
-defmodule Approval.ApprovalLines.ApprovalLine do
+defmodule Approval.Documents.ApprovalLine do
   use Ecto.Schema
   import Ecto.Changeset
 

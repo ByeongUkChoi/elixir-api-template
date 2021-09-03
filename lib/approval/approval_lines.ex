@@ -6,7 +6,7 @@ defmodule Approval.ApprovalLines do
   import Ecto.Query, warn: false
   alias Approval.Repo
 
-  alias Approval.ApprovalLines.ApprovalLine
+  alias Approval.Documents.ApprovalLine
 
   @doc """
   Returns the list of approval_lines.

@@ -4,7 +4,7 @@ defmodule Approval.ApprovalLinesTest do
   alias Approval.ApprovalLines
 
   describe "approval_lines" do
-    alias Approval.ApprovalLines.ApprovalLine
+    alias Approval.Documents.ApprovalLine
 
     @valid_attrs %{acted_at: ~N[2010-04-17 14:00:00], approval_type: "some approval_type", approver_id: 42, opinion: "some opinion", received_at: ~N[2010-04-17 14:00:00], sequence: 42}
     @update_attrs %{acted_at: ~N[2011-05-18 15:01:01], approval_type: "some updated approval_type", approver_id: 43, opinion: "some updated opinion", received_at: ~N[2011-05-18 15:01:01], sequence: 43}

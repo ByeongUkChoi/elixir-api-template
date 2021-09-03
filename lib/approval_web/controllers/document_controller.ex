@@ -4,7 +4,7 @@ defmodule ApprovalWeb.DocumentController do
   alias Approval.Documents
   alias Approval.Documents.Document
 
-  alias Approval.ApprovalLines.ApprovalLine
+  alias Approval.Documents.ApprovalLine
 
   alias Approval.Repo
   alias Ecto.Multi

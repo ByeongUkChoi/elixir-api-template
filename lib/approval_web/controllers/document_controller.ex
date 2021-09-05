@@ -53,7 +53,7 @@ defmodule ApprovalWeb.DocumentController do
     approval_line = Documents.get_approval_line!(document, approver_id)
     case params["approve_type"] do
       "confirm" -> confirm(document, approval_line, params["opinion"])
-      "reject" -> reject(document, approval_line, params["opinion"])
+      "reject" -> Documents.reject(document, approver_id, params["opinion"])
       "pending" -> pending(document, approval_line)
       _ -> :error
     end
@@ -71,17 +71,6 @@ defmodule ApprovalWeb.DocumentController do
       end
 
       Document.changeset(document, %{status: CONFIRMED})
-      |> Repo.update!()
-    end)
-    :ok
-  end
-
-  defp reject(document, approval_line, opinion) do
-    Repo.transaction(fn ->
-      ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-      |> Repo.update!()
-
-      Document.changeset(document, %{status: REJECTED})
       |> Repo.update!()
     end)
     :ok

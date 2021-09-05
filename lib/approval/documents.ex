@@ -3,11 +3,22 @@ defmodule Approval.Documents do
   The Documents context.
   """
 
-  import Ecto.Query, warn: false
   alias Approval.Repo
 
   alias Approval.Documents.Document
+  alias Approval.Documents.ApprovalLine
 
+  @spec get_document_list(map) ::
+          {any,
+           %Phoenix.Pagination{
+             items: [],
+             max_page: any,
+             page: any,
+             params: any,
+             per_page: integer,
+             total_count: any,
+             total_pages: integer
+           }}
   def get_document_list(params) do
     Repo.paginate(Document, params)
   end
@@ -17,6 +28,9 @@ defmodule Approval.Documents do
     |> Repo.preload(:approval_lines)
   end
 
+  @doc """
+  문서의 결재자 번호로 현재 결재선 반환
+  """
   def get_approval_line!(%Document{} = document, approver_id) do
     document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approval_type == PENDING) end)
@@ -24,6 +38,16 @@ defmodule Approval.Documents do
     |> List.first()
   end
 
+  @doc """
+  TODO: 반환을 튜플이 아닌 결재선 or nil 로 할지..
+
+  문서의 현재 결재선 번호로 다음 결재선을 반환하다.
+
+  다음 결재선이 있을 경우
+  {:ok, 다음 결재선}
+  다음 결재선이 없을 경우
+  {:error, nil}
+  """
   def get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
     approval_line = document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
@@ -33,6 +57,23 @@ defmodule Approval.Documents do
       nil -> {:error, nil}
       _ -> {:ok, approval_line}
     end
+  end
+
+  @doc """
+  문서를 반려하다.
+  기안자 의견 및 처리 시간 추가, 문서 상태 변경
+  """
+  def reject(%Document{} = document, approver_id, opinion) do
+    approval_line = get_approval_line!(document, approver_id)
+
+    Repo.transaction(fn ->
+      ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
+      |> Repo.update!()
+
+      Document.changeset(document, %{status: REJECTED})
+      |> Repo.update!()
+    end)
+    :ok
   end
 
   ######

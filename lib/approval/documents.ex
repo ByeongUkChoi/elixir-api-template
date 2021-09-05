@@ -60,6 +60,27 @@ defmodule Approval.Documents do
   end
 
   @doc """
+  문서를 승인하다.
+  """
+  def confirm(document, approver_id, opinion) do
+    approval_line = get_approval_line!(document, approver_id)
+
+    Repo.transaction(fn ->
+      ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
+      |> Repo.update!()
+
+      with {:ok, next_approval_line} <- get_next_approval_line(document, approval_line.sequence) do
+        ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
+        |> Repo.update!()
+      end
+
+      Document.changeset(document, %{status: CONFIRMED})
+      |> Repo.update!()
+    end)
+    :ok
+  end
+
+  @doc """
   문서를 반려하다.
   기안자 의견 및 처리 시간 추가, 문서 상태 변경
   """
@@ -71,6 +92,22 @@ defmodule Approval.Documents do
       |> Repo.update!()
 
       Document.changeset(document, %{status: REJECTED})
+      |> Repo.update!()
+    end)
+    :ok
+  end
+
+  @doc """
+  문서를 보류하다
+  결재선 처리 시간 추가, 문서 상태 변경
+  """
+  def pending(document, approver_id) do
+    approval_line = get_approval_line!(document, approver_id)
+
+    Repo.transaction(fn ->
+      ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
+      |> Repo.update!()
+      Document.changeset(document, %{status: PENDING})
       |> Repo.update!()
     end)
     :ok

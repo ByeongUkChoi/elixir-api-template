@@ -50,40 +50,13 @@ defmodule ApprovalWeb.DocumentController do
   def approve(conn, params)  do
     document = Documents.get_document_with_approval_lines!(params["id"])
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
-    approval_line = Documents.get_approval_line!(document, approver_id)
     case params["approve_type"] do
-      "confirm" -> confirm(document, approval_line, params["opinion"])
+      "confirm" -> Documents.confirm(document, approver_id, params["opinion"])
       "reject" -> Documents.reject(document, approver_id, params["opinion"])
-      "pending" -> pending(document, approval_line)
+      "pending" -> Documents.pending(document, approver_id)
       _ -> :error
     end
     send_resp(conn, :ok, "success")
-  end
-
-  defp confirm(document, approval_line, opinion) do
-    Repo.transaction(fn ->
-      ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-      |> Repo.update!()
-
-      with {:ok, next_approval_line} <- Documents.get_next_approval_line(document, approval_line.sequence) do
-        ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
-        |> Repo.update!()
-      end
-
-      Document.changeset(document, %{status: CONFIRMED})
-      |> Repo.update!()
-    end)
-    :ok
-  end
-
-  defp pending(document, approval_line) do
-    Repo.transaction(fn ->
-      ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
-      |> Repo.update!()
-      Document.changeset(document, %{status: PENDING})
-      |> Repo.update!()
-    end)
-    :ok
   end
 
   ############

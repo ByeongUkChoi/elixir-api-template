@@ -39,24 +39,14 @@ defmodule Approval.Documents do
   end
 
   @doc """
-  TODO: 반환을 튜플이 아닌 결재선 or nil 로 할지..
-
   문서의 현재 결재선 번호로 다음 결재선을 반환하다.
 
-  다음 결재선이 있을 경우
-  {:ok, 다음 결재선}
-  다음 결재선이 없을 경우
-  {:error, nil}
+  다음 결재선이 없을 경우 nil 반환
   """
   def get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
-    approval_line = document.approval_lines
+    document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
     |> hd
-
-    case approval_line do
-      nil -> {:error, nil}
-      _ -> {:ok, approval_line}
-    end
   end
 
   @doc """
@@ -69,7 +59,9 @@ defmodule Approval.Documents do
       ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
       |> Repo.update!()
 
-      with {:ok, next_approval_line} <- get_next_approval_line(document, approval_line.sequence) do
+      # if문으로 nil이 아닌지 검사하는 것 보다 with 문이 더 좋은지..
+      with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
+        true <- next_approval_line != nil do
         ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
         |> Repo.update!()
       end

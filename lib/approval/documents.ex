@@ -8,17 +8,6 @@ defmodule Approval.Documents do
   alias Approval.Documents.Document
   alias Approval.Documents.ApprovalLine
 
-  @spec get_document_list(map) ::
-          {any,
-           %Phoenix.Pagination{
-             items: [],
-             max_page: any,
-             page: any,
-             params: any,
-             per_page: integer,
-             total_count: any,
-             total_pages: integer
-           }}
   def get_document_list(params) do
     Repo.paginate(Document, params)
   end

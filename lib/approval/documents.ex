@@ -165,6 +165,7 @@ defmodule Approval.Documents do
     |> Repo.update()
   end
 
+  ############## 기본 함수
   @doc """
   Deletes a document.
 

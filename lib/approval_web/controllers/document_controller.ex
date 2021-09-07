@@ -22,25 +22,39 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def draft(conn, params) do
-    {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Multi.new()
-    |> Multi.insert(:document, %Document{
+    # multi insert를 사용하지 않고 repo.insert 사용
+    {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Repo.insert(%Document{
       title: params["title"],
       content: params["content"],
       drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
       drafter_opinion: params["opinion"],
-    })
-    |> Multi.merge(fn %{document: document} ->
-      Multi.new()
-      |> Multi.insert_all(:approval_lines_insert_all, ApprovalLine, Enum.map(params["approveLines"], fn(approve_line) ->
+      approval_lines: Enum.map(params["approveLines"], fn(approve_line) ->
         %{
-          document_id: document.id,
           sequence: approve_line["sequence"],
           approver_id: approve_line["approverId"],
-          received_at: approve_line["sequence"] == 1 && document.inserted_at || nil
+          received_at: approve_line["sequence"] == 1 && NaiveDateTime.utc_now() || nil
         }
-      end))
-    end)
-    |> Repo.transaction()
+      end)
+    })
+    # {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Multi.new()
+    # |> Multi.insert(:document, %Document{
+    #   title: params["title"],
+    #   content: params["content"],
+    #   drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
+    #   drafter_opinion: params["opinion"],
+    # })
+    # |> Multi.merge(fn %{document: document} ->
+    #   Multi.new()
+    #   |> Multi.insert_all(:approval_lines_insert_all, ApprovalLine, Enum.map(params["approveLines"], fn(approve_line) ->
+    #     %{
+    #       document_id: document.id,
+    #       sequence: approve_line["sequence"],
+    #       approver_id: approve_line["approverId"],
+    #       received_at: approve_line["sequence"] == 1 && document.inserted_at || nil
+    #     }
+    #   end))
+    # end)
+    # |> Repo.transaction()
 
     conn
     |> put_status(:created)

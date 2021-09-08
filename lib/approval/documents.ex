@@ -125,10 +125,6 @@ defmodule Approval.Documents do
   """
   def get_document!(id), do: Repo.get!(Document, id)
 
-  @spec create_document(
-          :invalid
-          | %{optional(:__struct__) => none, optional(atom | binary) => any}
-        ) :: any
   @doc """
   Creates a document.
 

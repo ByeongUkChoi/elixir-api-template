@@ -22,20 +22,23 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def draft(conn, params) do
+    {:ok, document} = Documents.create_document(params)
+
     # multi insert를 사용하지 않고 repo.insert 사용
-    {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Repo.insert(%Document{
-      title: params["title"],
-      content: params["content"],
-      drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
-      drafter_opinion: params["opinion"],
-      approval_lines: Enum.map(params["approveLines"], fn(approve_line) ->
-        %{
-          sequence: approve_line["sequence"],
-          approver_id: approve_line["approverId"],
-          received_at: approve_line["sequence"] == 1 && NaiveDateTime.utc_now() || nil
-        }
-      end)
-    })
+    # {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Repo.insert(%Document{
+    #   title: params["title"],
+    #   content: params["content"],
+    #   drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
+    #   drafter_opinion: params["opinion"],
+    #   approval_lines: Enum.map(params["approveLines"], fn(approve_line) ->
+    #     %{
+    #       sequence: approve_line["sequence"],
+    #       approver_id: approve_line["approverId"],
+    #       received_at: approve_line["sequence"] == 1 && NaiveDateTime.utc_now() || nil
+    #     }
+    #   end)
+    # })
+
     # {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Multi.new()
     # |> Multi.insert(:document, %Document{
     #   title: params["title"],

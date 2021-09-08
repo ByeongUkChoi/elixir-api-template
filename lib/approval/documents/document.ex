@@ -18,5 +18,6 @@ defmodule Approval.Documents.Document do
     document
     |> cast(attrs, [:title, :content, :drafter_id, :drafter_opinion])
     |> validate_required([:title, :content, :drafter_id, :drafter_opinion])
+    |> cast_assoc(:approval_lines)
   end
 end

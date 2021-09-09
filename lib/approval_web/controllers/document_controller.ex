@@ -76,7 +76,7 @@ defmodule ApprovalWeb.DocumentController do
     send_resp(conn, :ok, "success")
   end
 
-  ############## 기본 함수
+    ############## 기본 함수
   def create(conn, %{"document" => document_params}) do
     with {:ok, %Document{} = document} <- Documents.create_document(document_params) do
       conn

@@ -41,7 +41,7 @@ defmodule Approval.Documents do
   @doc """
   문서를 승인하다.
   """
-  def confirm(document, approver_id, opinion) do
+  def confirm(%Document{} = document, approver_id, opinion) do
     approval_line = get_approval_line!(document, approver_id)
 
     Repo.transaction(fn ->
@@ -82,7 +82,7 @@ defmodule Approval.Documents do
   문서를 보류하다
   결재선 처리 시간 추가, 문서 상태 변경
   """
-  def pending(document, approver_id) do
+  def pending(%Document{} = document, approver_id) do
     approval_line = get_approval_line!(document, approver_id)
 
     Repo.transaction(fn ->
@@ -93,6 +93,14 @@ defmodule Approval.Documents do
     end)
     :ok
   end
+
+  #### TODO: 승인하기 새로운 함수. 아톰으로 패턴매칭
+  # def approve(document, :confirm, approver_id, opinion) do
+  # end
+  # def approve(document, :reject, approver_id, opinion) do
+  # end
+  # def approve(document, :pending, approver_id, opinion) do
+  # end
 
   ######
 

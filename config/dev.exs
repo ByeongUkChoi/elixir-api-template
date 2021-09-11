@@ -2,8 +2,8 @@ use Mix.Config
 
 # Configure your database
 config :approval, Approval.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "root",
+  password: "",
   database: "approval_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,

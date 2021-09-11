@@ -212,6 +212,13 @@ Add task
 iex -S mix phx.server
 ```
 ### database
+#### mysql 5.7
+```
+docker pull mysql:5.7
+docker run -d -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql:5.7
+```
+
+#### postgres
 ```
 docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
 docker exec -it postgres

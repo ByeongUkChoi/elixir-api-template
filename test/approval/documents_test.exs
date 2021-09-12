@@ -20,8 +20,22 @@ defmodule Approval.DocumentsTest do
     end
 
     test "get_document_with_approval_lines!/1 returns the document with given id" do
+      # given
       document = document_fixture()
+      # when & then
       assert Documents.get_document_with_approval_lines!(document.id) == document
+    end
+
+    test "get_document_list/1 returns all documents without approval lines" do
+      # given
+      document = document_fixture()
+
+      # when
+      {documents, _paginagion} = Documents.get_document_list(%{})
+
+      # then
+      documents_withou_approval_lines = Enum.map(documents, &Map.delete(&1, :approval_lines))
+      assert documents_withou_approval_lines == [Map.delete(document, :approval_lines)]
     end
   end
 end

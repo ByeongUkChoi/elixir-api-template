@@ -8,7 +8,7 @@ defmodule Approval.Documents do
   alias Approval.Documents.Document
   alias Approval.Documents.ApprovalLine
 
-  def get_document_list(params) do
+  def get_document_list(%{} = params) do
     Repo.paginate(Document, params)
   end
 
@@ -17,22 +17,17 @@ defmodule Approval.Documents do
     |> Repo.preload(:approval_lines)
   end
 
-  @doc """
-  문서의 결재자 번호로 현재 결재선 반환
-  """
-  def get_approval_line!(%Document{} = document, approver_id) do
+  # 문서의 결재자 번호로 현재 결재선 반환
+  defp get_approval_line!(%Document{} = document, approver_id) do
     document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approval_type == PENDING) end)
     |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
     |> List.first()
   end
 
-  @doc """
-  문서의 현재 결재선 번호로 다음 결재선을 반환하다.
-
-  다음 결재선이 없을 경우 nil 반환
-  """
-  def get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
+  # 문서의 현재 결재선 번호로 다음 결재선을 반환하다.
+  # 다음 결재선이 없을 경우 nil 반환
+  defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
     document.approval_lines
     |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
     |> hd

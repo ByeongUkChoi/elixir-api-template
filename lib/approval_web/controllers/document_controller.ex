@@ -17,7 +17,7 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def draft(conn, params) do
-    {:ok, document} = Documents.create_document(params)
+    {:ok, document} = Documents.draft_document(params)
 
     # multi insert를 사용하지 않고 repo.insert 사용
     # {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Repo.insert(%Document{

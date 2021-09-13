@@ -12,9 +12,9 @@ defmodule Approval.DocumentsTest do
 
     def document_fixture(attrs \\ %{}) do
       {:ok, document} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Documents.create_document()
+        %Document{}
+        |> Document.changeset(Enum.into(attrs, @valid_attrs))
+        |> Repo.insert()
 
       document
     end
@@ -36,6 +36,14 @@ defmodule Approval.DocumentsTest do
       # then
       documents_withou_approval_lines = Enum.map(documents, &Map.delete(&1, :approval_lines))
       assert documents_withou_approval_lines == [Map.delete(document, :approval_lines)]
+    end
+
+    test "draft_document/1 with valid data creates a document" do
+      assert {:ok, %Document{} = document} = Documents.draft_document(@valid_attrs)
+      assert document.content == "some content"
+      assert document.drafter_id == 42
+      assert document.drafter_opinion == "some drafter_opinion"
+      assert document.title == "some title"
     end
   end
 end

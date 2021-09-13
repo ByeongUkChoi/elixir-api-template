@@ -17,6 +17,15 @@ defmodule Approval.Documents do
     |> Repo.preload(:approval_lines)
   end
 
+  @doc """
+  문서를 기안한다.
+  """
+  def draft_document(attrs \\ %{}) do
+    %Document{}
+    |> Document.changeset(attrs)
+    |> Repo.insert()
+  end
+
   # 문서의 결재자 번호로 현재 결재선 반환
   defp get_approval_line!(%Document{} = document, approver_id) do
     document.approval_lines

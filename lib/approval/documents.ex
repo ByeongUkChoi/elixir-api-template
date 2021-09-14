@@ -3,6 +3,8 @@ defmodule Approval.Documents do
   The Documents context.
   """
 
+  alias Ecto.Multi
+
   alias Approval.Repo
 
   alias Approval.Documents.Document
@@ -48,6 +50,12 @@ defmodule Approval.Documents do
   def confirm(%Document{} = document, approver_id, opinion) do
     approval_line = get_approval_line!(document, approver_id)
 
+    # TODO: fix Repo.transaction -> Multi
+    # changeset = ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
+    # Multi.new()
+    #   |> Multi.update(:update, changeset)
+    # |> Repo.transaction()
+
     Repo.transaction(fn ->
       ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
       |> Repo.update!()
@@ -72,13 +80,11 @@ defmodule Approval.Documents do
   def reject(%Document{} = document, approver_id, opinion) do
     approval_line = get_approval_line!(document, approver_id)
 
-    Repo.transaction(fn ->
-      ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-      |> Repo.update!()
+    Multi.new()
+    |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()}))
+    |> Multi.update(:update, Document.changeset(document, %{status: REJECTED}))
+    |> Repo.transaction()
 
-      Document.changeset(document, %{status: REJECTED})
-      |> Repo.update!()
-    end)
     :ok
   end
 
@@ -89,12 +95,11 @@ defmodule Approval.Documents do
   def pending(%Document{} = document, approver_id) do
     approval_line = get_approval_line!(document, approver_id)
 
-    Repo.transaction(fn ->
-      ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
-      |> Repo.update!()
-      Document.changeset(document, %{status: PENDING})
-      |> Repo.update!()
-    end)
+    Multi.new()
+    |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()}))
+    |> Multi.update(:update, Document.changeset(document, %{status: PENDING}))
+    |> Repo.transaction()
+
     :ok
   end
 

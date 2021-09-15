@@ -50,26 +50,33 @@ defmodule Approval.Documents do
   def confirm(%Document{} = document, approver_id, opinion) do
     approval_line = get_approval_line!(document, approver_id)
 
-    # TODO: fix Repo.transaction -> Multi
-    # changeset = ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-    # Multi.new()
-    #   |> Multi.update(:update, changeset)
-    # |> Repo.transaction()
+    multi = Multi.new()
+      |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()}))
 
-    Repo.transaction(fn ->
-      ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-      |> Repo.update!()
+    with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
+      true <- next_approval_line != nil do
+        multi
+        |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()}))
+    end
 
-      # if문으로 nil이 아닌지 검사하는 것 보다 with 문이 더 좋은지..
-      with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
-        true <- next_approval_line != nil do
-        ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
-        |> Repo.update!()
-      end
+    multi
+    |> Repo.transaction()
 
-      Document.changeset(document, %{status: CONFIRMED})
-      |> Repo.update!()
-    end)
+    # Repo.transaction(fn ->
+    #   ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
+    #   |> Repo.update!()
+
+    #   # if문으로 nil이 아닌지 검사하는 것 보다 with 문이 더 좋은지..
+    #   with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
+    #     true <- next_approval_line != nil do
+    #     ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
+    #     |> Repo.update!()
+    #   end
+
+    #   Document.changeset(document, %{status: CONFIRMED})
+    #   |> Repo.update!()
+    # end)
+
     :ok
   end
 

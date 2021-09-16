@@ -23,7 +23,7 @@ defmodule Approval.DocumentsTest do
       # given
       document = document_fixture()
       # when & then
-      assert Documents.get_document_with_approval_lines!(document.id) == document
+      assert document == Documents.get_document_with_approval_lines!(document.id)
     end
 
     test "get_document_list/1 returns all documents without approval lines" do
@@ -40,10 +40,7 @@ defmodule Approval.DocumentsTest do
 
     test "draft_document/1 with valid data creates a document" do
       assert {:ok, %Document{} = document} = Documents.draft_document(@valid_attrs)
-      assert document.content == "some content"
-      assert document.drafter_id == 42
-      assert document.drafter_opinion == "some drafter_opinion"
-      assert document.title == "some title"
+      assert @valid_attrs = document
     end
   end
 end

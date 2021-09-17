@@ -18,8 +18,17 @@ defmodule Approval.Documents.ApprovalLine do
   @doc false
   def changeset(approval_line, attrs) do
     approval_line
-    |> cast(attrs, [:sequence, :approver_id, :approval_type, :opinion, :received_at, :acted_at, :document_id])
+    |> cast(attrs, [
+      :sequence,
+      :approver_id,
+      :approval_type,
+      :opinion,
+      :received_at,
+      :acted_at,
+      :document_id
+    ])
     |> validate_required([:approver_id])
+
     # |> validate_required([:sequence, :approver_id, :approval_type, :opinion, :received_at, :acted_at])
   end
 end

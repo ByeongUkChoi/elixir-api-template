@@ -31,7 +31,10 @@ defmodule Approval.Documents do
   # 문서의 결재자 번호로 현재 결재선 반환
   defp get_approval_line!(%Document{} = document, approver_id) do
     document.approval_lines
-    |> Enum.filter(fn approval_line -> approval_line.received_at != nil and ( approval_line.acted_at == nil or approval_line.approval_type == PENDING) end)
+    |> Enum.filter(fn approval_line ->
+      approval_line.received_at != nil and
+        (approval_line.acted_at == nil or approval_line.approval_type == PENDING)
+    end)
     |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
     |> List.first()
   end
@@ -40,7 +43,9 @@ defmodule Approval.Documents do
   # 다음 결재선이 없을 경우 nil 반환
   defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
     document.approval_lines
-    |> Enum.filter(fn approval_line -> approval_line.sequence == current_approval_line_sequence + 1 end)
+    |> Enum.filter(fn approval_line ->
+      approval_line.sequence == current_approval_line_sequence + 1
+    end)
     |> hd
   end
 
@@ -50,13 +55,26 @@ defmodule Approval.Documents do
   def confirm(%Document{} = document, approver_id, opinion) do
     approval_line = get_approval_line!(document, approver_id)
 
-    multi = Multi.new()
-      |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()}))
+    multi =
+      Multi.new()
+      |> Multi.update(
+        :update,
+        ApprovalLine.changeset(approval_line, %{
+          opinion: opinion,
+          acted_at: NaiveDateTime.local_now()
+        })
+      )
 
     with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
-      true <- next_approval_line != nil do
-        multi
-        |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()}))
+         true <- next_approval_line != nil do
+      multi
+      |> Multi.update(
+        :update,
+        ApprovalLine.changeset(approval_line, %{
+          opinion: opinion,
+          acted_at: NaiveDateTime.local_now()
+        })
+      )
     end
 
     multi
@@ -88,7 +106,13 @@ defmodule Approval.Documents do
     approval_line = get_approval_line!(document, approver_id)
 
     Multi.new()
-    |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()}))
+    |> Multi.update(
+      :update,
+      ApprovalLine.changeset(approval_line, %{
+        opinion: opinion,
+        acted_at: NaiveDateTime.local_now()
+      })
+    )
     |> Multi.update(:update, Document.changeset(document, %{status: REJECTED}))
     |> Repo.transaction()
 
@@ -103,7 +127,10 @@ defmodule Approval.Documents do
     approval_line = get_approval_line!(document, approver_id)
 
     Multi.new()
-    |> Multi.update(:update, ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()}))
+    |> Multi.update(
+      :update,
+      ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
+    )
     |> Multi.update(:update, Document.changeset(document, %{status: PENDING}))
     |> Repo.transaction()
 

@@ -59,19 +59,21 @@ defmodule ApprovalWeb.DocumentController do
     |> show(%{"id" => document.id})
   end
 
-  def approve(conn, params)  do
+  def approve(conn, params) do
     document = Documents.get_document_with_approval_lines!(params["id"])
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
+
     case params["approve_type"] do
       "confirm" -> Documents.confirm(document, approver_id, params["opinion"])
       "reject" -> Documents.reject(document, approver_id, params["opinion"])
       "pending" -> Documents.pending(document, approver_id)
       _ -> :error
     end
+
     send_resp(conn, :ok, "success")
   end
 
-    ############## 기본 함수
+  ############## 기본 함수
   def create(conn, %{"document" => document_params}) do
     with {:ok, %Document{} = document} <- Documents.create_document(document_params) do
       conn

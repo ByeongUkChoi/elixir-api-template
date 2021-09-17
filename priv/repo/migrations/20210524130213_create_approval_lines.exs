@@ -10,7 +10,6 @@ defmodule Approval.Repo.Migrations.CreateApprovalLines do
       add :received_at, :naive_datetime
       add :acted_at, :naive_datetime
       add :document_id, references(:documents, on_delete: :nothing)
-
     end
 
     create index(:approval_lines, [:document_id])

@@ -11,6 +11,5 @@ defmodule Approval.Repo.Migrations.CreateDocuments do
 
       timestamps()
     end
-
   end
 end

@@ -7,6 +7,7 @@ defmodule ApprovalWeb.Router do
 
   scope "/api", ApprovalWeb do
     pipe_through :api
+
     scope "/documents" do
       # get documments
       get "", DocumentController, :index

@@ -1,17 +1,20 @@
 defmodule Approval.DocumentsTest do
   use Approval.DataCase
 
-  alias Approval.Documents
+  import Ecto.Changeset
 
-  describe "documents" do
-    alias Approval.Documents.Document
+  alias Approval.Documents
+  alias Approval.Documents.Document
+
+  describe "documents context test" do
 
     @valid_attrs %{
+      title: "some title",
       content: "some content",
       drafter_id: 42,
       drafter_opinion: "some drafter_opinion",
-      title: "some title",
-      approval_lines: [%{sequence: 1, approver_id: 11}]
+      status: "ON_PROGRESS",
+      approval_lines: [%{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]}]
     }
     # @update_attrs %{content: "some updated content", drafter_id: 43, drafter_opinion: "some updated drafter_opinion", title: "some updated title"}
     # @invalid_attrs %{content: nil, drafter_id: nil, drafter_opinion: nil, title: nil}
@@ -47,6 +50,9 @@ defmodule Approval.DocumentsTest do
     test "draft_document/1 with valid data creates a document" do
       assert {:ok, %Document{} = document} = Documents.draft_document(@valid_attrs)
       assert @valid_attrs = document
+    end
+
+    test "approve :confirm" do
     end
   end
 end

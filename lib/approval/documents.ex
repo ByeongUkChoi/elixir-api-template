@@ -28,27 +28,6 @@ defmodule Approval.Documents do
     |> Repo.insert()
   end
 
-  # 문서의 결재자 번호로 현재 결재선 반환
-  defp get_approval_line!(%Document{} = document, approver_id) do
-    document.approval_lines
-    |> Enum.filter(fn approval_line ->
-      approval_line.received_at != nil and
-        (approval_line.acted_at == nil or approval_line.approval_type == PENDING)
-    end)
-    |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
-    |> List.first()
-  end
-
-  # 문서의 현재 결재선 번호로 다음 결재선을 반환하다.
-  # 다음 결재선이 없을 경우 nil 반환
-  defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
-    document.approval_lines
-    |> Enum.filter(fn approval_line ->
-      approval_line.sequence == current_approval_line_sequence + 1
-    end)
-    |> hd
-  end
-
   @doc """
   문서를 승인하다.
   """
@@ -135,6 +114,27 @@ defmodule Approval.Documents do
     |> Repo.transaction()
 
     :ok
+  end
+
+  # 문서의 결재자 번호로 현재 결재선 반환
+  defp get_approval_line!(%Document{} = document, approver_id) do
+    document.approval_lines
+    |> Enum.filter(fn approval_line ->
+      approval_line.received_at != nil and
+        (approval_line.acted_at == nil or approval_line.approval_type == PENDING)
+    end)
+    |> Enum.filter(fn approval_line -> approval_line.approver_id == approver_id end)
+    |> List.first()
+  end
+
+  # 문서의 현재 결재선 번호로 다음 결재선을 반환하다.
+  # 다음 결재선이 없을 경우 nil 반환
+  defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
+    document.approval_lines
+    |> Enum.filter(fn approval_line ->
+      approval_line.sequence == current_approval_line_sequence + 1
+    end)
+    |> hd
   end
 
   #### TODO: 승인하기 새로운 함수. 아톰으로 패턴매칭

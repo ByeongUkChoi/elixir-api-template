@@ -16,7 +16,7 @@ defmodule Approval.Documents.Document do
   @doc false
   def changeset(document, attrs) do
     document
-    |> cast(attrs, [:title, :content, :drafter_id, :drafter_opinion])
+    |> cast(attrs, [:title, :content, :drafter_id, :drafter_opinion, :status])
     |> validate_required([:title, :content, :drafter_id, :drafter_opinion])
     |> cast_assoc(:approval_lines)
   end

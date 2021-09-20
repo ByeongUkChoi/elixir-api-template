@@ -22,7 +22,7 @@ defmodule Approval.DocumentsTest do
     def document_fixture(attrs \\ %{}) do
       {:ok, document} =
         %Document{}
-        |> Document.changeset(Enum.into(attrs, @valid_attrs))
+        |> change(Enum.into(attrs, @valid_attrs))
         |> Repo.insert()
 
       document

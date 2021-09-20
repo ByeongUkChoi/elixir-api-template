@@ -20,4 +20,12 @@ defmodule Approval.Documents.Document do
     |> validate_required([:title, :content, :drafter_id, :drafter_opinion])
     |> cast_assoc(:approval_lines)
   end
+
+  @doc false
+  def insert_changeset(attrs) do
+    %__MODULE__{}
+    |> cast(attrs, [:title, :content, :drafter_id, :drafter_opinion, :status])
+    |> validate_required([:title, :content, :drafter_id, :drafter_opinion])
+    |> cast_assoc(:approval_lines)
+  end
 end

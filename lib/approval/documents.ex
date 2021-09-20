@@ -23,8 +23,7 @@ defmodule Approval.Documents do
   문서를 기안한다.
   """
   def draft_document(attrs \\ %{}) do
-    %Document{}
-    |> Document.changeset(attrs)
+    Document.insert_changeset(attrs)
     |> Repo.insert()
   end
 

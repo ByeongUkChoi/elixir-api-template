@@ -118,7 +118,16 @@ defmodule Approval.DocumentsTest do
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))
-      # TODO: check next approver receive date
+
+      %{approver_id: next_approver_id} =
+        @document_with_middle_approval_line.approval_lines
+        |> Enum.find(&(is_nil(&1.received_at)))
+
+      %{received_at: received_at} =
+        document.approval_lines
+        |> Enum.find(&(&1.approver_id == next_approver_id))
+
+      refute is_nil(received_at)
     end
   end
 end

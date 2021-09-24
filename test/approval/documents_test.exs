@@ -35,7 +35,10 @@ defmodule Approval.DocumentsTest do
       status: "ON_PROGRESS",
       inserted_at: ~N[2000-01-01 23:00:07],
       updated_at: ~N[2000-01-01 23:00:07],
-      approval_lines: [%{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]}, %{sequence: 1, approver_id: 11}]
+      approval_lines: [
+        %{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]},
+        %{sequence: 1, approver_id: 11}
+      ]
     }
 
     # @update_attrs %{content: "some updated content", drafter_id: 43, drafter_opinion: "some updated drafter_opinion", title: "some updated title"}
@@ -121,7 +124,7 @@ defmodule Approval.DocumentsTest do
 
       %{approver_id: next_approver_id} =
         @document_with_middle_approval_line.approval_lines
-        |> Enum.find(&(is_nil(&1.received_at)))
+        |> Enum.find(&is_nil(&1.received_at))
 
       %{received_at: received_at} =
         document.approval_lines

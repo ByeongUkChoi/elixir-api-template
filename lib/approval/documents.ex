@@ -30,7 +30,8 @@ defmodule Approval.Documents do
   @doc """
   문서를 승인하다.
   """
-  def confirm(%Document{} = document, approver_id, opinion) do
+  def confirm(document_id, approver_id, opinion) do
+    document = Repo.get!(Document, document_id) |> Repo.preload(:approval_lines)
     approval_line = get_approval_line!(document, approver_id)
 
     multi =

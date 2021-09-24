@@ -54,6 +54,11 @@ defmodule Approval.Documents do
           acted_at: NaiveDateTime.local_now()
         })
       )
+    else
+      _ ->
+        document
+        |> Document.changeset(%{status: "CONFIRMED"})
+        |> Repo.update()
     end
 
     multi
@@ -73,7 +78,6 @@ defmodule Approval.Documents do
     #   Document.changeset(document, %{status: CONFIRMED})
     #   |> Repo.update!()
     # end)
-
     :ok
   end
 
@@ -131,10 +135,9 @@ defmodule Approval.Documents do
   # 다음 결재선이 없을 경우 nil 반환
   defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
     document.approval_lines
-    |> Enum.filter(fn approval_line ->
+    |> Enum.find(fn approval_line ->
       approval_line.sequence == current_approval_line_sequence + 1
     end)
-    |> hd
   end
 
   #### TODO: 승인하기 새로운 함수. 아톰으로 패턴매칭

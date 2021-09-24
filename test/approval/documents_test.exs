@@ -37,7 +37,7 @@ defmodule Approval.DocumentsTest do
       updated_at: ~N[2000-01-01 23:00:07],
       approval_lines: [
         %{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]},
-        %{sequence: 1, approver_id: 11}
+        %{sequence: 2, approver_id: 12, received_at: nil}
       ]
     }
 
@@ -88,13 +88,14 @@ defmodule Approval.DocumentsTest do
 
       approval_opinion = "confirm document!!!!"
 
-      # when
-      {:ok, document} = Documents.confirm(document_id, approver_id, approval_opinion)
+      # when & then
+      assert :ok == Documents.confirm(document_id, approver_id, approval_opinion)
 
-      # then
-      assert CONFIRMED == document.status
+      document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
 
-      assert %{approval_opinion: approval_opinion} =
+      assert "CONFIRMED" == document.status
+
+      assert %{opinion: ^approval_opinion} =
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))

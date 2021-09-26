@@ -74,7 +74,17 @@ defmodule Approval.DocumentsTest do
 
     test "draft_document/1 with valid data creates a document" do
       assert {:ok, %Document{} = document} = Documents.draft_document(@valid_attrs)
-      assert @valid_attrs = document
+
+      assert %{
+               title: "some title",
+               content: "some content",
+               drafter_id: 42,
+               drafter_opinion: "some drafter_opinion",
+               status: "ON_PROGRESS",
+               approval_lines: [
+                 %{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]}
+               ]
+             } = document
     end
 
     test "confirm/3 document without remaining approval line" do
@@ -121,7 +131,7 @@ defmodule Approval.DocumentsTest do
 
       assert "ON_PROGRESS" == document.status
 
-      assert %{opinion: approval_opinion} =
+      assert %{opinion: ^approval_opinion} =
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))

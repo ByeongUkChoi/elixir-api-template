@@ -88,9 +88,10 @@ defmodule Approval.DocumentsTest do
 
       approval_opinion = "confirm document!!!!"
 
-      # when & then
+      # when
       assert :ok == Documents.confirm(document_id, approver_id, approval_opinion)
 
+      # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
 
       assert "CONFIRMED" == document.status
@@ -113,12 +114,14 @@ defmodule Approval.DocumentsTest do
       approval_opinion = "confirm document!!!!"
 
       # when
-      {:ok, document} = Documents.confirm(document_id, approver_id, approval_opinion)
+      assert :ok = Documents.confirm(document_id, approver_id, approval_opinion)
 
       # then
-      assert ON_PROGRESS == document.status
+      document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
 
-      assert %{approval_opinion: approval_opinion} =
+      assert "ON_PROGRESS" == document.status
+
+      assert %{opinion: approval_opinion} =
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))

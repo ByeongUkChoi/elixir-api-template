@@ -34,50 +34,34 @@ defmodule Approval.Documents do
     document = Repo.get!(Document, document_id) |> Repo.preload(:approval_lines)
     approval_line = get_approval_line!(document, approver_id)
 
-    multi =
-      Multi.new()
-      |> Multi.update(
-        :update,
-        ApprovalLine.changeset(approval_line, %{
-          opinion: opinion,
-          acted_at: NaiveDateTime.local_now()
-        })
-      )
+    Multi.new()
+    |> Multi.update(
+      :update,
+      ApprovalLine.changeset(approval_line, %{
+        opinion: opinion,
+        acted_at: NaiveDateTime.local_now()
+      })
+    )
+    |> Multi.run(:update_next_approval_line, fn repo, _ ->
+      with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
+           true <- next_approval_line != nil do
+        repo.update(
+          ApprovalLine.changeset(next_approval_line, %{
+            received_at: NaiveDateTime.local_now()
+          })
+        )
 
-    with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
-         true <- next_approval_line != nil do
-      multi
-      |> Multi.update(
-        :update,
-        ApprovalLine.changeset(approval_line, %{
-          opinion: opinion,
-          acted_at: NaiveDateTime.local_now()
-        })
-      )
-    else
-      _ ->
-        document
-        |> Document.changeset(%{status: "CONFIRMED"})
-        |> Repo.update()
-    end
+        {:ok, nil}
+      else
+        _ ->
+          Document.changeset(document, %{status: "CONFIRMED"})
+          |> repo.update()
 
-    multi
+          {:ok, nil}
+      end
+    end)
     |> Repo.transaction()
 
-    # Repo.transaction(fn ->
-    #   ApprovalLine.changeset(approval_line, %{opinion: opinion, acted_at: NaiveDateTime.local_now()})
-    #   |> Repo.update!()
-
-    #   # if문으로 nil이 아닌지 검사하는 것 보다 with 문이 더 좋은지..
-    #   with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
-    #     true <- next_approval_line != nil do
-    #     ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
-    #     |> Repo.update!()
-    #   end
-
-    #   Document.changeset(document, %{status: CONFIRMED})
-    #   |> Repo.update!()
-    # end)
     :ok
   end
 

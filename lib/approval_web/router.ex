@@ -10,11 +10,11 @@ defmodule ApprovalWeb.Router do
 
     scope "/documents" do
       # get documments
-      get "", DocumentController, :index
+      get "/", DocumentController, :index
       get "/:id", DocumentController, :show
 
       # draft document
-      post "", DocumentController, :draft
+      post "/", DocumentController, :draft
 
       # approve document
       put "/:id/:approve_type", DocumentController, :approve

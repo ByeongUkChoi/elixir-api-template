@@ -7,7 +7,7 @@ defmodule Approval.Documents.Document do
     field :content, :string
     field :drafter_id, :integer
     field :drafter_opinion, :string
-    field :status, :string
+    field :status, Ecto.Enum, values: [:ON_PROGRESS, :PENDING, :CONFIRMED, :REJECTED]
     has_many :approval_lines, Approval.Documents.ApprovalLine
 
     timestamps()

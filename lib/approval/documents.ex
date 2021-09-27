@@ -54,7 +54,7 @@ defmodule Approval.Documents do
         {:ok, nil}
       else
         _ ->
-          Document.changeset(document, %{status: "CONFIRMED"})
+          Document.changeset(document, %{status: :CONFIRMED})
           |> repo.update()
 
           {:ok, nil}

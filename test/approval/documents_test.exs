@@ -12,7 +12,7 @@ defmodule Approval.DocumentsTest do
       content: "some content",
       drafter_id: 42,
       drafter_opinion: "some drafter_opinion",
-      status: "ON_PROGRESS",
+      status: :ON_PROGRESS,
       inserted_at: ~N[2000-01-01 23:00:07],
       updated_at: ~N[2000-01-01 23:00:07],
       approval_lines: [%{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]}]
@@ -22,7 +22,7 @@ defmodule Approval.DocumentsTest do
       content: "some content",
       drafter_id: 42,
       drafter_opinion: "some drafter_opinion",
-      status: "ON_PROGRESS",
+      status: :ON_PROGRESS,
       inserted_at: ~N[2000-01-01 23:00:07],
       updated_at: ~N[2000-01-01 23:00:07],
       approval_lines: [%{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]}]
@@ -32,7 +32,7 @@ defmodule Approval.DocumentsTest do
       content: "some content",
       drafter_id: 42,
       drafter_opinion: "some drafter_opinion",
-      status: "ON_PROGRESS",
+      status: :ON_PROGRESS,
       inserted_at: ~N[2000-01-01 23:00:07],
       updated_at: ~N[2000-01-01 23:00:07],
       approval_lines: [
@@ -80,7 +80,7 @@ defmodule Approval.DocumentsTest do
                content: "some content",
                drafter_id: 42,
                drafter_opinion: "some drafter_opinion",
-               status: "ON_PROGRESS",
+               status: :ON_PROGRESS,
                approval_lines: [
                  %{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]}
                ]
@@ -104,7 +104,7 @@ defmodule Approval.DocumentsTest do
       # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
 
-      assert "CONFIRMED" == document.status
+      assert :CONFIRMED == document.status
 
       assert %{opinion: ^approval_opinion} =
                document.approval_lines
@@ -129,7 +129,7 @@ defmodule Approval.DocumentsTest do
       # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
 
-      assert "ON_PROGRESS" == document.status
+      assert :ON_PROGRESS == document.status
 
       assert %{opinion: ^approval_opinion} =
                document.approval_lines

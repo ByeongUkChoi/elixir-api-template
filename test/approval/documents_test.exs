@@ -124,7 +124,7 @@ defmodule Approval.DocumentsTest do
       approval_opinion = "confirm document!!!!"
 
       # when
-      assert :ok = Documents.confirm(document_id, approver_id, approval_opinion)
+      assert :ok == Documents.confirm(document_id, approver_id, approval_opinion)
 
       # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
@@ -145,6 +145,31 @@ defmodule Approval.DocumentsTest do
         |> Enum.find(&(&1.approver_id == next_approver_id))
 
       refute is_nil(received_at)
+    end
+
+    test "reject/3 document" do
+      # given
+      document = document_fixture()
+
+      %{approver_id: approver_id} =
+        document.approval_lines
+        |> Enum.reverse()
+        |> Enum.find(&(!is_nil(&1.received_at)))
+
+      approval_opinion = "reject!!!!!!!!"
+      # when
+      assert :ok == Documents.reject(document.id, approver_id, approval_opinion)
+
+      # then
+      actual_document = Repo.get(Document, document.id) |> Repo.preload(:approval_lines)
+
+      assert :REJECTED == actual_document.status
+
+      assert %{opinion: ^approval_opinion} =
+               actual_document.approval_lines
+               |> Enum.reverse()
+               |> Enum.filter(&(!is_nil(&1.acted_at)))
+               |> Enum.find(&(&1.approver_id == approver_id))
     end
   end
 end

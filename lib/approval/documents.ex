@@ -69,18 +69,19 @@ defmodule Approval.Documents do
   문서를 반려하다.
   기안자 의견 및 처리 시간 추가, 문서 상태 변경
   """
-  def reject(%Document{} = document, approver_id, opinion) do
+  def reject(document_id, approver_id, opinion) do
+    document = Repo.get!(Document, document_id) |> Repo.preload(:approval_lines)
     approval_line = get_approval_line!(document, approver_id)
 
     Multi.new()
     |> Multi.update(
-      :update,
+      :update_approval_line,
       ApprovalLine.changeset(approval_line, %{
         opinion: opinion,
         acted_at: NaiveDateTime.local_now()
       })
     )
-    |> Multi.update(:update, Document.changeset(document, %{status: REJECTED}))
+    |> Multi.update(:update, Document.changeset(document, %{status: :REJECTED}))
     |> Repo.transaction()
 
     :ok

@@ -12,7 +12,7 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def show(conn, %{"id" => id}) do
-    document = Documents.get_document_with_approval_lines!(id)
+    document = Documents.get_document_with_approval_lines(id)
     render(conn, "show.json", document: document)
   end
 
@@ -60,7 +60,7 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def approve(conn, params) do
-    document = Documents.get_document_with_approval_lines!(params["id"])
+    document = Documents.get_document_with_approval_lines(params["id"])
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
 
     case params["approve_type"] do

@@ -53,11 +53,11 @@ defmodule Approval.DocumentsTest do
       document
     end
 
-    test "get_document_with_approval_lines!/1 returns the document with given id" do
+    test "get_document_with_approval_lines/1 returns the document with given id" do
       # given
       document = document_fixture()
       # when & then
-      assert document == Documents.get_document_with_approval_lines!(document.id)
+      assert document == Documents.get_document_with_approval_lines(document.id)
     end
 
     test "get_document_list/1 returns all documents without approval lines" do

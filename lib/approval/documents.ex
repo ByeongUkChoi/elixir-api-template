@@ -14,8 +14,8 @@ defmodule Approval.Documents do
     Repo.paginate(Document, params)
   end
 
-  def get_document_with_approval_lines!(id) do
-    Repo.get!(Document, id)
+  def get_document_with_approval_lines(id) do
+    Repo.get(Document, id)
     |> Repo.preload(:approval_lines)
   end
 
@@ -31,18 +31,32 @@ defmodule Approval.Documents do
   문서를 승인하다.
   """
   def confirm(document_id, approver_id, opinion) do
-    document = Repo.get!(Document, document_id) |> Repo.preload(:approval_lines)
-    approval_line = get_approval_line!(document, approver_id)
-
     Multi.new()
-    |> Multi.update(
-      :update,
+    |> Multi.run(:document, fn _, _ ->
+      case get_document_with_approval_lines(document_id) do
+        %Document{} = document -> {:ok, document}
+        _ -> {:error, "Not found document"}
+      end
+    end)
+    |> Multi.run(:approval_line, fn _, %{document: document} ->
+      case get_approval_line(document, approver_id) do
+        %ApprovalLine{} = approval_line -> {:ok, approval_line}
+        _ -> {:error, "Not found approval line"}
+      end
+    end)
+    |> Multi.run(:update, fn repo, %{approval_line: approval_line} ->
       ApprovalLine.changeset(approval_line, %{
         opinion: opinion,
         acted_at: NaiveDateTime.local_now()
       })
-    )
-    |> Multi.run(:update_next_approval_line, fn repo, _ ->
+      |> repo.update()
+      {:ok, nil}
+    end)
+    |> Multi.run(:update_next_approval_line, fn repo,
+                                                %{
+                                                  document: document,
+                                                  approval_line: approval_line
+                                                } ->
       with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
            true <- next_approval_line != nil do
         repo.update(
@@ -71,7 +85,7 @@ defmodule Approval.Documents do
   """
   def reject(document_id, approver_id, opinion) do
     document = Repo.get!(Document, document_id) |> Repo.preload(:approval_lines)
-    approval_line = get_approval_line!(document, approver_id)
+    approval_line = get_approval_line(document, approver_id)
 
     Multi.new()
     |> Multi.update(
@@ -92,7 +106,7 @@ defmodule Approval.Documents do
   결재선 처리 시간 추가, 문서 상태 변경
   """
   def pending(%Document{} = document, approver_id) do
-    approval_line = get_approval_line!(document, approver_id)
+    approval_line = get_approval_line(document, approver_id)
 
     Multi.new()
     |> Multi.update(
@@ -106,7 +120,7 @@ defmodule Approval.Documents do
   end
 
   # 문서의 결재자 번호로 현재 결재선 반환
-  defp get_approval_line!(%Document{} = document, approver_id) do
+  defp get_approval_line(%Document{} = document, approver_id) do
     document.approval_lines
     |> Enum.filter(fn approval_line ->
       approval_line.received_at != nil and

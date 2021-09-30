@@ -75,8 +75,10 @@ defmodule Approval.Documents do
       end
     end)
     |> Repo.transaction()
-
-    :ok
+    |> case do
+      {:ok, %{document: %Document{} = document}} -> {:ok, document}
+      {:error, _, msg, _} -> {:error, msg}
+    end
   end
 
   @doc """

@@ -99,7 +99,7 @@ defmodule Approval.DocumentsTest do
       approval_opinion = "confirm document!!!!"
 
       # when
-      assert :ok == Documents.confirm(document_id, approver_id, approval_opinion)
+      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.confirm(document_id, approver_id, approval_opinion)
 
       # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
@@ -124,7 +124,7 @@ defmodule Approval.DocumentsTest do
       approval_opinion = "confirm document!!!!"
 
       # when
-      assert :ok == Documents.confirm(document_id, approver_id, approval_opinion)
+      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.confirm(document_id, approver_id, approval_opinion)
 
       # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
@@ -145,6 +145,10 @@ defmodule Approval.DocumentsTest do
         |> Enum.find(&(&1.approver_id == next_approver_id))
 
       refute is_nil(received_at)
+    end
+
+    test "confirm/3 with wrong document id" do
+      assert {:error, "Not found document"} == Documents.confirm(-1, 1, "opinion")
     end
 
     test "reject/3 document" do

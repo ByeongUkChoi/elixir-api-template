@@ -97,10 +97,12 @@ defmodule Approval.Documents do
         acted_at: NaiveDateTime.local_now()
       })
     )
-    |> Multi.update(:update, Document.changeset(document, %{status: :REJECTED}))
+    |> Multi.update(:document, Document.changeset(document, %{status: :REJECTED}))
     |> Repo.transaction()
-
-    :ok
+    |> case do
+      {:ok, %{document: %Document{} = document}} -> {:ok, document}
+      {:error, _, msg, _} -> {:error, msg}
+    end
   end
 
   @doc """

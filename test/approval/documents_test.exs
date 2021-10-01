@@ -160,9 +160,10 @@ defmodule Approval.DocumentsTest do
         |> Enum.reverse()
         |> Enum.find(&(!is_nil(&1.received_at)))
 
+      document_id = document.id
       approval_opinion = "reject!!!!!!!!"
       # when
-      assert :ok == Documents.reject(document.id, approver_id, approval_opinion)
+      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.reject(document_id, approver_id, approval_opinion)
 
       # then
       actual_document = Repo.get(Document, document.id) |> Repo.preload(:approval_lines)

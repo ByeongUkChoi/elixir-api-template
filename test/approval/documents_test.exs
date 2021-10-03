@@ -99,7 +99,8 @@ defmodule Approval.DocumentsTest do
       approval_opinion = "confirm document!!!!"
 
       # when
-      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.confirm(document_id, approver_id, approval_opinion)
+      assert {:ok, %Document{} = %{id: ^document_id}} =
+               Documents.confirm(document_id, approver_id, approval_opinion)
 
       # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
@@ -124,7 +125,8 @@ defmodule Approval.DocumentsTest do
       approval_opinion = "confirm document!!!!"
 
       # when
-      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.confirm(document_id, approver_id, approval_opinion)
+      assert {:ok, %Document{} = %{id: ^document_id}} =
+               Documents.confirm(document_id, approver_id, approval_opinion)
 
       # then
       document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
@@ -163,7 +165,8 @@ defmodule Approval.DocumentsTest do
       document_id = document.id
       approval_opinion = "reject!!!!!!!!"
       # when
-      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.reject(document_id, approver_id, approval_opinion)
+      assert {:ok, %Document{} = %{id: ^document_id}} =
+               Documents.reject(document_id, approver_id, approval_opinion)
 
       # then
       actual_document = Repo.get(Document, document.id) |> Repo.preload(:approval_lines)
@@ -175,6 +178,10 @@ defmodule Approval.DocumentsTest do
                |> Enum.reverse()
                |> Enum.filter(&(!is_nil(&1.acted_at)))
                |> Enum.find(&(&1.approver_id == approver_id))
+    end
+
+    test "reject/3 with wrong document id" do
+      assert {:error, "Not found document"} == Documents.reject(-1, 1, "opinion")
     end
   end
 end

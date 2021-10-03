@@ -30,6 +30,7 @@ defmodule Approval.Documents do
   @doc """
   문서를 승인하다.
   """
+  @spec confirm(integer(), integer(), String.t()) :: {:ok, %Document{}} | {:error, any}
   def confirm(document_id, approver_id, opinion) do
     Multi.new()
     |> Multi.run(:document, fn _, _ ->
@@ -50,6 +51,7 @@ defmodule Approval.Documents do
         acted_at: NaiveDateTime.local_now()
       })
       |> repo.update()
+
       {:ok, nil}
     end)
     |> Multi.run(:update_next_approval_line, fn repo,
@@ -85,19 +87,32 @@ defmodule Approval.Documents do
   문서를 반려하다.
   기안자 의견 및 처리 시간 추가, 문서 상태 변경
   """
+  @spec reject(integer(), integer(), String.t()) :: {:ok, %Document{}} | {:error, any}
   def reject(document_id, approver_id, opinion) do
-    document = Repo.get!(Document, document_id) |> Repo.preload(:approval_lines)
-    approval_line = get_approval_line(document, approver_id)
-
     Multi.new()
-    |> Multi.update(
-      :update_approval_line,
+    |> Multi.run(:document, fn _, _ ->
+      case get_document_with_approval_lines(document_id) do
+        %Document{} = document -> {:ok, document}
+        _ -> {:error, "Not found document"}
+      end
+    end)
+    |> Multi.run(:approval_line, fn _, %{document: document} ->
+      case get_approval_line(document, approver_id) do
+        %ApprovalLine{} = approval_line -> {:ok, approval_line}
+        _ -> {:error, "Not found approval line"}
+      end
+    end)
+    |> Multi.run(:update_approval_line, fn repo, %{approval_line: approval_line} ->
       ApprovalLine.changeset(approval_line, %{
         opinion: opinion,
         acted_at: NaiveDateTime.local_now()
       })
-    )
-    |> Multi.update(:document, Document.changeset(document, %{status: :REJECTED}))
+      |> repo.update()
+    end)
+    |> Multi.run(:update_document, fn repo, %{document: document} ->
+      Document.changeset(document, %{status: :REJECTED})
+      |> repo.update()
+    end)
     |> Repo.transaction()
     |> case do
       {:ok, %{document: %Document{} = document}} -> {:ok, document}
@@ -123,7 +138,7 @@ defmodule Approval.Documents do
     :ok
   end
 
-  # 문서의 결재자 번호로 현재 결재선 반환
+  # 문서의 결재자 번호로 현재 결재선 반환 (없으면 nil 반환)
   defp get_approval_line(%Document{} = document, approver_id) do
     document.approval_lines
     |> Enum.filter(fn approval_line ->
@@ -134,22 +149,13 @@ defmodule Approval.Documents do
     |> List.first()
   end
 
-  # 문서의 현재 결재선 번호로 다음 결재선을 반환하다.
-  # 다음 결재선이 없을 경우 nil 반환
+  # 문서의 현재 결재선 번호로 다음 결재선을 반환하다. (다음 결재선이 없을 경우 nil 반환)
   defp get_next_approval_line(%Document{} = document, current_approval_line_sequence) do
     document.approval_lines
     |> Enum.find(fn approval_line ->
       approval_line.sequence == current_approval_line_sequence + 1
     end)
   end
-
-  #### TODO: 승인하기 새로운 함수. 아톰으로 패턴매칭
-  # def approve(document, :confirm, approver_id, opinion) do
-  # end
-  # def approve(document, :reject, approver_id, opinion) do
-  # end
-  # def approve(document, :pending, approver_id, opinion) do
-  # end
 
   ######
 

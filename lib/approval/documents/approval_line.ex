@@ -30,4 +30,13 @@ defmodule Approval.Documents.ApprovalLine do
     ])
     |> validate_required([:sequence, :approver_id])
   end
+
+  def approval_changeset(approval_line, %{
+        approval_type: approval_type,
+        opinion: opinion,
+        acted_at: acted_at
+      }) do
+    change(approval_line, %{approval_type: approval_type, acted_at: acted_at})
+    |> cast(%{opinion: opinion}, [:opinion])
+  end
 end

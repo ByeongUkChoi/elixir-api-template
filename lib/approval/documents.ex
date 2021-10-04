@@ -46,7 +46,8 @@ defmodule Approval.Documents do
       end
     end)
     |> Multi.run(:update, fn repo, %{approval_line: approval_line} ->
-      ApprovalLine.changeset(approval_line, %{
+      ApprovalLine.approval_changeset(approval_line, %{
+        approval_type: :CONFIRMED,
         opinion: opinion,
         acted_at: NaiveDateTime.local_now()
       })
@@ -100,7 +101,8 @@ defmodule Approval.Documents do
       end
     end)
     |> Multi.run(:update_approval_line, fn repo, %{approval_line: approval_line} ->
-      ApprovalLine.changeset(approval_line, %{
+      ApprovalLine.approval_changeset(approval_line, %{
+        approval_type: :REJECTED,
         opinion: opinion,
         acted_at: NaiveDateTime.local_now()
       })

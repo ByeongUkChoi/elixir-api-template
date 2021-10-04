@@ -61,11 +61,8 @@ defmodule Approval.Documents do
                                                 } ->
       with next_approval_line <- get_next_approval_line(document, approval_line.sequence),
            true <- next_approval_line != nil do
-        repo.update(
-          ApprovalLine.changeset(next_approval_line, %{
-            received_at: NaiveDateTime.local_now()
-          })
-        )
+        ApprovalLine.changeset(next_approval_line, %{received_at: NaiveDateTime.local_now()})
+        |> repo.update()
 
         {:ok, nil}
       else

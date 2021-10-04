@@ -2,12 +2,14 @@ defmodule Approval.Documents.Document do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Ecto.Enum
+
   schema "documents" do
     field :title, :string
     field :content, :string
     field :drafter_id, :integer
     field :drafter_opinion, :string
-    field :status, Ecto.Enum, values: [:ON_PROGRESS, :PENDING, :CONFIRMED, :REJECTED]
+    field :status, Enum, values: [:ON_PROGRESS, :PENDING, :CONFIRMED, :REJECTED]
     has_many :approval_lines, Approval.Documents.ApprovalLine
 
     timestamps()

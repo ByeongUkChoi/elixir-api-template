@@ -4,7 +4,7 @@ defmodule Approval.DocumentsTest do
   import Ecto.Changeset
 
   alias Approval.Documents
-  alias Approval.Documents.Document
+  alias Approval.Documents.{Document, ApprovalLine}
 
   describe "documents context test" do
     @valid_attrs %{
@@ -107,10 +107,11 @@ defmodule Approval.DocumentsTest do
 
       assert :CONFIRMED == document.status
 
-      assert %{opinion: ^approval_opinion} =
+      assert %{opinion: ^approval_opinion, acted_at: acted_at} =
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))
+      refute is_nil(acted_at)
     end
 
     test "confirm/3 document with remaining approval line" do
@@ -133,19 +134,19 @@ defmodule Approval.DocumentsTest do
 
       assert :ON_PROGRESS == document.status
 
-      assert %{opinion: ^approval_opinion} =
+      assert %{opinion: ^approval_opinion, acted_at: acted_at} =
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))
+      refute is_nil(acted_at)
 
       %{approver_id: next_approver_id} =
         @document_with_middle_approval_line.approval_lines
         |> Enum.find(&is_nil(&1.received_at))
 
-      %{received_at: received_at} =
+      %{received_at: received_at, acted_at: nil} =
         document.approval_lines
         |> Enum.find(&(&1.approver_id == next_approver_id))
-
       refute is_nil(received_at)
     end
 
@@ -173,11 +174,12 @@ defmodule Approval.DocumentsTest do
 
       assert :REJECTED == actual_document.status
 
-      assert %{opinion: ^approval_opinion} =
+      assert %{opinion: ^approval_opinion, acted_at: acted_at} =
                actual_document.approval_lines
                |> Enum.reverse()
                |> Enum.filter(&(!is_nil(&1.acted_at)))
                |> Enum.find(&(&1.approver_id == approver_id))
+      refute is_nil(acted_at)
     end
 
     test "reject/3 with wrong document id" do

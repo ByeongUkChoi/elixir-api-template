@@ -185,5 +185,31 @@ defmodule Approval.DocumentsTest do
     test "reject/3 with wrong document id" do
       assert {:error, "Not found document"} == Documents.reject(-1, 1, "opinion")
     end
+
+    test "pending/2 document" do
+      # given
+      document = document_fixture()
+
+      %{approver_id: approver_id} =
+        document.approval_lines
+        |> Enum.reverse()
+        |> Enum.find(&(!is_nil(&1.received_at)))
+
+      document_id = document.id
+      # when
+      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.pending(document_id, approver_id)
+
+      # then
+      actual_document = Repo.get(Document, document.id) |> Repo.preload(:approval_lines)
+
+      assert :PENDING == actual_document.status
+
+      assert %{opinion: nil, acted_at: acted_at} =
+               actual_document.approval_lines
+               |> Enum.reverse()
+               |> Enum.filter(&(!is_nil(&1.acted_at)))
+               |> Enum.find(&(&1.approver_id == approver_id))
+      refute is_nil(acted_at)
+    end
   end
 end

@@ -123,18 +123,38 @@ defmodule Approval.Documents do
   문서를 보류하다
   결재선 처리 시간 추가, 문서 상태 변경
   """
-  def pending(%Document{} = document, approver_id) do
-    approval_line = get_approval_line(document, approver_id)
-
+  @spec pending(integer(), integer()) :: {:ok, %Document{}} | {:error, any}
+  def pending(document_id, approver_id) do
     Multi.new()
-    |> Multi.update(
-      :update,
-      ApprovalLine.changeset(approval_line, %{acted_at: NaiveDateTime.local_now()})
-    )
-    |> Multi.update(:update, Document.changeset(document, %{status: PENDING}))
+    |> Multi.run(:document, fn _, _ ->
+      case get_document_with_approval_lines(document_id) do
+        %Document{} = document -> {:ok, document}
+        _ -> {:error, "Not found document"}
+      end
+    end)
+    |> Multi.run(:approval_line, fn _, %{document: document} ->
+      case get_approval_line(document, approver_id) do
+        %ApprovalLine{} = approval_line -> {:ok, approval_line}
+        _ -> {:error, "Not found approval line"}
+      end
+    end)
+    |> Multi.run(:update_approval_line, fn repo, %{approval_line: approval_line} ->
+      ApprovalLine.approval_changeset(approval_line, %{
+        approval_type: :PENDING,
+        opinion: nil,
+        acted_at: NaiveDateTime.local_now()
+      })
+      |> repo.update()
+    end)
+    |> Multi.run(:update_document, fn repo, %{document: document} ->
+      Document.changeset(document, %{status: :PENDING})
+      |> repo.update()
+    end)
     |> Repo.transaction()
-
-    :ok
+    |> case do
+      {:ok, %{document: %Document{} = document}} -> {:ok, document}
+      {:error, _, msg, _} -> {:error, msg}
+    end
   end
 
   # 문서의 결재자 번호로 현재 결재선 반환 (없으면 nil 반환)

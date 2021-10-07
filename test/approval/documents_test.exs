@@ -154,6 +154,11 @@ defmodule Approval.DocumentsTest do
       assert {:error, "Not found document"} == Documents.confirm(-1, 1, "opinion")
     end
 
+    test "confirm/3 with wrong approver id" do
+      %{id: document_id} = document_fixture()
+      assert {:error, "Not found approval line"} == Documents.confirm(document_id, 1, "opinion")
+    end
+
     test "reject/3 document" do
       # given
       document = document_fixture()
@@ -186,6 +191,11 @@ defmodule Approval.DocumentsTest do
       assert {:error, "Not found document"} == Documents.reject(-1, 1, "opinion")
     end
 
+    test "reject/3 with wrong approver id" do
+      %{id: document_id} = document_fixture()
+      assert {:error, "Not found approval line"} == Documents.reject(document_id, 1, "opinion")
+    end
+
     test "pending/2 document" do
       # given
       document = document_fixture()
@@ -210,6 +220,15 @@ defmodule Approval.DocumentsTest do
                |> Enum.filter(&(!is_nil(&1.acted_at)))
                |> Enum.find(&(&1.approver_id == approver_id))
       refute is_nil(acted_at)
+    end
+
+    test "pending/2 with wrong document id" do
+      assert {:error, "Not found document"} == Documents.pending(-1, 1)
+    end
+
+    test "pending/2 with wrong approver id" do
+      %{id: document_id} = document_fixture()
+      assert {:error, "Not found approval line"} == Documents.pending(document_id, 1)
     end
   end
 end

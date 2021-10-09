@@ -41,9 +41,6 @@ defmodule Approval.DocumentsTest do
       ]
     }
 
-    # @update_attrs %{content: "some updated content", drafter_id: 43, drafter_opinion: "some updated drafter_opinion", title: "some updated title"}
-    # @invalid_attrs %{content: nil, drafter_id: nil, drafter_opinion: nil, title: nil}
-
     def document_fixture(attrs \\ %{}) do
       {:ok, document} =
         %Document{}
@@ -111,6 +108,7 @@ defmodule Approval.DocumentsTest do
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))
+
       refute is_nil(acted_at)
     end
 
@@ -138,6 +136,7 @@ defmodule Approval.DocumentsTest do
                document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))
+
       refute is_nil(acted_at)
 
       %{approver_id: next_approver_id} =
@@ -147,6 +146,7 @@ defmodule Approval.DocumentsTest do
       %{received_at: received_at, acted_at: nil} =
         document.approval_lines
         |> Enum.find(&(&1.approver_id == next_approver_id))
+
       refute is_nil(received_at)
     end
 
@@ -184,6 +184,7 @@ defmodule Approval.DocumentsTest do
                |> Enum.reverse()
                |> Enum.filter(&(!is_nil(&1.acted_at)))
                |> Enum.find(&(&1.approver_id == approver_id))
+
       refute is_nil(acted_at)
     end
 
@@ -207,7 +208,8 @@ defmodule Approval.DocumentsTest do
 
       document_id = document.id
       # when
-      assert {:ok, %Document{} = %{id: ^document_id}} = Documents.pending(document_id, approver_id)
+      assert {:ok, %Document{} = %{id: ^document_id}} =
+               Documents.pending(document_id, approver_id)
 
       # then
       actual_document = Repo.get(Document, document.id) |> Repo.preload(:approval_lines)

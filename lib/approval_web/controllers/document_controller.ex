@@ -19,54 +19,18 @@ defmodule ApprovalWeb.DocumentController do
   def draft(conn, params) do
     {:ok, document} = Documents.draft_document(params)
 
-    # multi insert를 사용하지 않고 repo.insert 사용
-    # {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Repo.insert(%Document{
-    #   title: params["title"],
-    #   content: params["content"],
-    #   drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
-    #   drafter_opinion: params["opinion"],
-    #   approval_lines: Enum.map(params["approveLines"], fn(approve_line) ->
-    #     %{
-    #       sequence: approve_line["sequence"],
-    #       approver_id: approve_line["approverId"],
-    #       received_at: approve_line["sequence"] == 1 && NaiveDateTime.utc_now() || nil
-    #     }
-    #   end)
-    # })
-
-    # {:ok, %{approval_lines_insert_all: _insert_all, document: document}} = Multi.new()
-    # |> Multi.insert(:document, %Document{
-    #   title: params["title"],
-    #   content: params["content"],
-    #   drafter_id: get_req_header(conn, "x-user-id") |> hd |> String.to_integer(),
-    #   drafter_opinion: params["opinion"],
-    # })
-    # |> Multi.merge(fn %{document: document} ->
-    #   Multi.new()
-    #   |> Multi.insert_all(:approval_lines_insert_all, ApprovalLine, Enum.map(params["approveLines"], fn(approve_line) ->
-    #     %{
-    #       document_id: document.id,
-    #       sequence: approve_line["sequence"],
-    #       approver_id: approve_line["approverId"],
-    #       received_at: approve_line["sequence"] == 1 && document.inserted_at || nil
-    #     }
-    #   end))
-    # end)
-    # |> Repo.transaction()
-
     conn
     |> put_status(:created)
     |> show(%{"id" => document.id})
   end
 
   def approve(conn, params) do
-    document = Documents.get_document_with_approval_lines(params["id"])
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
 
     case params["approve_type"] do
-      "confirm" -> Documents.confirm(document, approver_id, params["opinion"])
-      "reject" -> Documents.reject(document, approver_id, params["opinion"])
-      "pending" -> Documents.pending(document, approver_id)
+      "confirm" -> Documents.confirm(params["id"], approver_id, params["opinion"])
+      "reject" -> Documents.reject(params["id"], approver_id, params["opinion"])
+      "pending" -> Documents.pending(params["id"], approver_id)
       _ -> :error
     end
 

@@ -142,7 +142,7 @@ defmodule Approval.Documents do
       ApprovalLine.approval_changeset(approval_line, %{
         approval_type: :PENDING,
         opinion: nil,
-        acted_at: NaiveDateTime.local_now()
+        acted_at: nil
       })
       |> repo.update()
     end)

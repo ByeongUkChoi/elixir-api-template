@@ -34,16 +34,36 @@ defmodule ApprovalWeb.DocumentControllerTest do
   describe "index" do
     test "lists all documents", %{conn: conn} do
       # given
-      document_fixture()
+      %{id: document_id} = document_fixture()
 
       # when
       conn = get(conn, Routes.document_path(conn, :index))
 
       # then
       assert json_response(conn, 200)["data"] |> length == 1
+      assert [%{"id" => ^document_id}] = json_response(conn, 200)["data"]
 
       assert %{"page" => 1, "per_page" => 10, "total_count" => 1} ==
                json_response(conn, 200)["pageable"]
+    end
+  end
+
+  describe "show" do
+    test "show document", %{conn: conn} do
+      # given
+      %{id: document_id} = document_fixture()
+
+      # when
+      conn = get(conn, Routes.document_path(conn, :show, document_id))
+
+      # then
+      assert %{"id" => ^document_id} = json_response(conn, 200)
+    end
+
+    test "not found document", %{conn: conn} do
+      assert_error_sent 404, fn ->
+        get(conn, Routes.document_path(conn, :show, -1))
+      end
     end
   end
 end

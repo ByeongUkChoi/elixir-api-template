@@ -12,8 +12,11 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def show(conn, %{"id" => id}) do
-    document = Documents.get_document_with_approval_lines(id)
-    render(conn, "show.json", document: document)
+    with %Document{} = document <- Documents.get_document_with_approval_lines(id) do
+      render(conn, "show.json", document: document)
+    else
+      nil -> {:error, :not_found}
+    end
   end
 
   def draft(conn, params) do

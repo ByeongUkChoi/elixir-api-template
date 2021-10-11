@@ -4,7 +4,6 @@ defmodule ApprovalWeb.DocumentControllerTest do
   import Ecto.Changeset
 
   alias Approval.Repo
-  alias Approval.Documents
   alias Approval.Documents.Document
 
   @valid_attrs %{
@@ -61,9 +60,8 @@ defmodule ApprovalWeb.DocumentControllerTest do
     end
 
     test "not found document", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get(conn, Routes.document_path(conn, :show, -1))
-      end
+      conn = get(conn, Routes.document_path(conn, :show, -1))
+      assert json_response(conn, 404)["errors"]["detail"] == "Not Found"
     end
   end
 end

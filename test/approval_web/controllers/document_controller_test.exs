@@ -68,15 +68,15 @@ defmodule ApprovalWeb.DocumentControllerTest do
   describe "draft" do
     test "draft document", %{conn: conn} do
       # given
+      drafter_id = 42
       approver_id = 11
-
       params = %{
-        title: "some title",
-        content: "some content",
-        drafter_id: 42,
-        drafter_opinion: "some drafter_opinion",
-        approval_lines: [%{sequence: 1, approver_id: approver_id}]
+        "title" => "some title",
+        "content" => "some content",
+        "drafterOpinion" => "some drafter_opinion",
+        "approvalLines" => [%{"sequence" => 1, "approver_id" => approver_id}]
       }
+      conn = put_req_header(conn, "x-user-id", "#{drafter_id}")
 
       # when
       conn = post(conn, Routes.document_path(conn, :draft), params)
@@ -84,10 +84,10 @@ defmodule ApprovalWeb.DocumentControllerTest do
       # then
       assert response = json_response(conn, 201)
 
-      assert params.title == response["title"]
-      assert params.content == response["content"]
-      assert params.drafter_id == response["drafterId"]
-      assert params.drafter_opinion == response["drafterOpinion"]
+      assert drafter_id == response["drafterId"]
+      assert params["title"] == response["title"]
+      assert params["content"] == response["content"]
+      assert params["drafterOpinion"] == response["drafterOpinion"]
 
       assert %{
                "approverId" => ^approver_id,

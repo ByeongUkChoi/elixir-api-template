@@ -22,13 +22,13 @@ defmodule ApprovalWeb.DocumentController do
   def draft(conn, params) do
     drafter_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
 
-    params =
-      params
-      |> Map.put("drafter_id", drafter_id)
-      # TODO: camel case to snake case
-      |> Map.put("drafter_opinion", params["drafterOpinion"])
-
-    {:ok, document} = Documents.draft_document(params)
+    {:ok, document} = Documents.draft_document(%{
+      drafter_id: drafter_id,
+      title: params["title"],
+      content: params["content"],
+      drafter_opinion: params["drafterOpinion"],
+      approval_lines: params["approvalLines"],
+    })
 
     conn
     |> put_status(:created)

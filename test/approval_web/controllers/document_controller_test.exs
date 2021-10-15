@@ -70,12 +70,14 @@ defmodule ApprovalWeb.DocumentControllerTest do
       # given
       drafter_id = 42
       approver_id = 11
+
       params = %{
         "title" => "some title",
         "content" => "some content",
         "drafterOpinion" => "some drafter_opinion",
         "approvalLines" => [%{"sequence" => 1, "approver_id" => approver_id}]
       }
+
       conn = put_req_header(conn, "x-user-id", "#{drafter_id}")
 
       # when
@@ -96,6 +98,37 @@ defmodule ApprovalWeb.DocumentControllerTest do
                "opinion" => nil,
                "receivedAt" => nil
              } = hd(response["approvalLines"])
+    end
+  end
+
+  describe "approve" do
+    test "confirm document", %{conn: conn} do
+      # given
+      %{id: document_id, approval_lines: [%{approver_id: approver_id}]} = document_fixture()
+      opinion = "confirm!!!"
+
+      params = %{
+        approve_type: "confirm",
+        opinion: opinion
+      }
+
+      conn = put_req_header(conn, "x-user-id", "#{approver_id}")
+
+      # when
+      conn = put(conn, Routes.document_path(conn, :approve, document_id, :confirm), params)
+
+      # then
+      assert %Document{} =
+               document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
+
+      assert %{
+               status: :CONFIRMED,
+               approval_lines: [
+                 %{approval_type: :CONFIRMED, opinion: ^opinion, acted_at: acted_at}
+               ]
+             } = document
+
+      refute is_nil(acted_at)
     end
   end
 end

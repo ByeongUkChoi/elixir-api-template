@@ -19,16 +19,21 @@ defmodule ApprovalWeb.DocumentController do
     end
   end
 
-  def draft(conn, params) do
+  def draft(conn, %{
+        "title" => title,
+        "content" => content,
+        "drafterOpinion" => drafter_opinion,
+        "approvalLines" => approval_lines
+      }) do
     drafter_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
 
     {:ok, document} =
       Documents.draft_document(%{
         drafter_id: drafter_id,
-        title: params["title"],
-        content: params["content"],
-        drafter_opinion: params["drafterOpinion"],
-        approval_lines: params["approvalLines"]
+        title: title,
+        content: content,
+        drafter_opinion: drafter_opinion,
+        approval_lines: approval_lines
       })
 
     conn
@@ -36,17 +41,25 @@ defmodule ApprovalWeb.DocumentController do
     |> show(%{"id" => document.id})
   end
 
-  def approve(conn, params) do
+  def approve(conn, %{"approve_type" => approve_type, "id" => document_id} = params) do
     approver_id = get_req_header(conn, "x-user-id") |> hd |> String.to_integer()
+    opinion = Map.get(params, "opinion")
 
-    case params["approve_type"] do
-      "confirm" -> Documents.confirm(params["id"], approver_id, params["opinion"])
-      "reject" -> Documents.reject(params["id"], approver_id, params["opinion"])
-      "pending" -> Documents.pending(params["id"], approver_id)
-      _ -> :error
+    with {:ok, _} <- _approve(approve_type, document_id, approver_id, opinion) do
+      send_resp(conn, :ok, "success")
     end
+  end
 
-    send_resp(conn, :ok, "success")
+  defp _approve("confirm", document_id, approver_id, opinion) do
+    Documents.confirm(document_id, approver_id, opinion)
+  end
+
+  defp _approve("reject", document_id, approver_id, opinion) do
+    Documents.reject(document_id, approver_id, opinion)
+  end
+
+  defp _approve("pending", document_id, approver_id, _) do
+    Documents.pending(document_id, approver_id)
   end
 
   ############## 기본 함수

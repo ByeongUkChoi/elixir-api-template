@@ -108,8 +108,7 @@ defmodule ApprovalWeb.DocumentControllerTest do
       opinion = "confirm!!!"
 
       params = %{
-        approve_type: "confirm",
-        opinion: opinion
+        "opinion" => opinion
       }
 
       conn = put_req_header(conn, "x-user-id", "#{approver_id}")

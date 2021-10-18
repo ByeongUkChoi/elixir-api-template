@@ -129,5 +129,14 @@ defmodule ApprovalWeb.DocumentControllerTest do
 
       refute is_nil(acted_at)
     end
+
+    test "Not found document error when confirm document", %{conn: conn} do
+      conn = put_req_header(conn, "x-user-id", "1")
+
+      conn =
+        put(conn, Routes.document_path(conn, :approve, -1, :confirm), %{"opinion" => "confirm!!!"})
+
+      assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
+    end
   end
 end

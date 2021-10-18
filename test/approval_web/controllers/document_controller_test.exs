@@ -138,5 +138,42 @@ defmodule ApprovalWeb.DocumentControllerTest do
 
       assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
     end
+
+    test "reject document", %{conn: conn} do
+      # given
+      %{id: document_id, approval_lines: [%{approver_id: approver_id}]} = document_fixture()
+      opinion = "reject!!!"
+
+      params = %{
+        "opinion" => opinion
+      }
+
+      conn = put_req_header(conn, "x-user-id", "#{approver_id}")
+
+      # when
+      conn = put(conn, Routes.document_path(conn, :approve, document_id, :reject), params)
+
+      # then
+      assert %Document{} =
+               document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
+
+      assert %{
+               status: :REJECTED,
+               approval_lines: [
+                 %{approval_type: :REJECTED, opinion: ^opinion, acted_at: acted_at}
+               ]
+             } = document
+
+      refute is_nil(acted_at)
+    end
+
+    test "Not found document error when reject document", %{conn: conn} do
+      conn = put_req_header(conn, "x-user-id", "1")
+
+      conn =
+        put(conn, Routes.document_path(conn, :approve, -1, :reject), %{"opinion" => "reject!!!"})
+
+      assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
+    end
   end
 end

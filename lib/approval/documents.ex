@@ -91,7 +91,7 @@ defmodule Approval.Documents do
     |> Multi.run(:document, fn _, _ ->
       case get_document_with_approval_lines(document_id) do
         %Document{} = document -> {:ok, document}
-        _ -> {:error, "Not found document"}
+        _ -> {:error, :not_found}
       end
     end)
     |> Multi.run(:approval_line, fn _, %{document: document} ->

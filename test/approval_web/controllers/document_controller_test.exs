@@ -78,9 +78,8 @@ defmodule ApprovalWeb.DocumentControllerTest do
         "approvalLines" => [%{"sequence" => 1, "approver_id" => approver_id}]
       }
 
-      conn = put_req_header(conn, "x-user-id", "#{drafter_id}")
-
       # when
+      conn = put_req_header(conn, "x-user-id", "#{drafter_id}")
       conn = post(conn, Routes.document_path(conn, :draft), params)
 
       # then
@@ -111,10 +110,9 @@ defmodule ApprovalWeb.DocumentControllerTest do
         "opinion" => opinion
       }
 
-      conn = put_req_header(conn, "x-user-id", "#{approver_id}")
-
       # when
-      conn = put(conn, Routes.document_path(conn, :approve, document_id, :confirm), params)
+      conn = put_req_header(conn, "x-user-id", "#{approver_id}")
+      put(conn, Routes.document_path(conn, :approve, document_id, :confirm), params)
 
       # then
       assert %Document{} =
@@ -134,7 +132,7 @@ defmodule ApprovalWeb.DocumentControllerTest do
       conn = put_req_header(conn, "x-user-id", "1")
 
       conn =
-        put(conn, Routes.document_path(conn, :approve, -1, :confirm), %{"opinion" => "confirm!!!"})
+      put(conn, Routes.document_path(conn, :approve, -1, :confirm), %{"opinion" => "confirm!!!"})
 
       assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
     end
@@ -148,10 +146,9 @@ defmodule ApprovalWeb.DocumentControllerTest do
         "opinion" => opinion
       }
 
-      conn = put_req_header(conn, "x-user-id", "#{approver_id}")
-
       # when
-      conn = put(conn, Routes.document_path(conn, :approve, document_id, :reject), params)
+      conn = put_req_header(conn, "x-user-id", "#{approver_id}")
+      put(conn, Routes.document_path(conn, :approve, document_id, :reject), params)
 
       # then
       assert %Document{} =
@@ -172,6 +169,35 @@ defmodule ApprovalWeb.DocumentControllerTest do
 
       conn =
         put(conn, Routes.document_path(conn, :approve, -1, :reject), %{"opinion" => "reject!!!"})
+
+      assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
+    end
+
+    test "pending document", %{conn: conn} do
+      # given
+      %{id: document_id, approval_lines: [%{approver_id: approver_id}]} = document_fixture()
+
+      # when
+      conn = put_req_header(conn, "x-user-id", "#{approver_id}")
+      put(conn, Routes.document_path(conn, :approve, document_id, :pending))
+
+      # then
+      assert %Document{} =
+               document = Repo.get(Document, document_id) |> Repo.preload(:approval_lines)
+
+      assert %{
+               status: :PENDING,
+               approval_lines: [
+                 %{approval_type: :PENDING, acted_at: nil}
+               ]
+             } = document
+    end
+
+    test "Not found document error when pending document", %{conn: conn} do
+      conn = put_req_header(conn, "x-user-id", "1")
+
+      conn =
+        put(conn, Routes.document_path(conn, :approve, -1, :pending))
 
       assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
     end

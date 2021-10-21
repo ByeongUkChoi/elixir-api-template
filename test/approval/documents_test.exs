@@ -151,7 +151,7 @@ defmodule Approval.DocumentsTest do
     end
 
     test "confirm/3 with wrong document id" do
-      assert {:error, "Not found document"} == Documents.confirm(-1, 1, "opinion")
+      assert {:error, :not_found} == Documents.confirm(-1, 1, "opinion")
     end
 
     test "confirm/3 with wrong approver id" do
@@ -189,7 +189,7 @@ defmodule Approval.DocumentsTest do
     end
 
     test "reject/3 with wrong document id" do
-      assert {:error, "Not found document"} == Documents.reject(-1, 1, "opinion")
+      assert {:error, :not_found} == Documents.reject(-1, 1, "opinion")
     end
 
     test "reject/3 with wrong approver id" do
@@ -223,7 +223,7 @@ defmodule Approval.DocumentsTest do
     end
 
     test "pending/2 with wrong document id" do
-      assert {:error, "Not found document"} == Documents.pending(-1, 1)
+      assert {:error, :not_found} == Documents.pending(-1, 1)
     end
 
     test "pending/2 with wrong approver id" do

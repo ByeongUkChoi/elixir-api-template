@@ -45,7 +45,8 @@ defmodule Approval.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_pagination, "~> 0.7.0"},
-      {:dialyxir, "~> 0.4", only: [:dev]}
+      {:dialyxir, "~> 0.4", only: [:dev]},
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 

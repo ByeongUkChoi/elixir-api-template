@@ -4,7 +4,7 @@ defmodule Approval.DocumentsTest do
   import Ecto.Changeset
 
   alias Approval.Documents
-  alias Approval.Documents.{Document, ApprovalLine}
+  alias Approval.Documents.Document
 
   describe "documents context test" do
     @valid_attrs %{

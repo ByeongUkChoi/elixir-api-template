@@ -12,9 +12,8 @@ defmodule ApprovalWeb.DocumentController do
   end
 
   def show(conn, %{"id" => id}) do
-    with %Document{} = document <- Documents.get_document_with_approval_lines(id) do
-      render(conn, "show.json", document: document)
-    else
+    case Documents.get_document_with_approval_lines(id) do
+      %Document{} = document -> render(conn, "show.json", document: document)
       nil -> {:error, :not_found}
     end
   end
@@ -60,23 +59,5 @@ defmodule ApprovalWeb.DocumentController do
 
   defp _approve("pending", document_id, approver_id, _) do
     Documents.pending(document_id, approver_id)
-  end
-
-  ############## 기본 함수
-  def create(conn, %{"document" => document_params}) do
-    with {:ok, %Document{} = document} <- Documents.create_document(document_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", Routes.document_path(conn, :show, document))
-      |> render("show.json", document: document)
-    end
-  end
-
-  def update(conn, %{"id" => id, "document" => document_params}) do
-    document = Documents.get_document!(id)
-
-    with {:ok, %Document{} = document} <- Documents.update_document(document, document_params) do
-      render(conn, "show.json", document: document)
-    end
   end
 end

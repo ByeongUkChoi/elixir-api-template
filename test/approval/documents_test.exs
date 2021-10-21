@@ -216,10 +216,12 @@ defmodule Approval.DocumentsTest do
 
       assert :PENDING == actual_document.status
 
-      assert %{opinion: nil, acted_at: nil} =
+      assert %{opinion: nil, acted_at: acted_at} =
                actual_document.approval_lines
                |> Enum.reverse()
                |> Enum.find(&(&1.approver_id == approver_id))
+
+      refute is_nil(acted_at)
     end
 
     test "pending/2 with wrong document id" do

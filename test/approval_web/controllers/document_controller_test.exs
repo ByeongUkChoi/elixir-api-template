@@ -132,7 +132,7 @@ defmodule ApprovalWeb.DocumentControllerTest do
       conn = put_req_header(conn, "x-user-id", "1")
 
       conn =
-      put(conn, Routes.document_path(conn, :approve, -1, :confirm), %{"opinion" => "confirm!!!"})
+        put(conn, Routes.document_path(conn, :approve, -1, :confirm), %{"opinion" => "confirm!!!"})
 
       assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
     end
@@ -188,16 +188,17 @@ defmodule ApprovalWeb.DocumentControllerTest do
       assert %{
                status: :PENDING,
                approval_lines: [
-                 %{approval_type: :PENDING, acted_at: nil}
+                 %{approval_type: :PENDING, acted_at: acted_at}
                ]
              } = document
+
+      refute is_nil(acted_at)
     end
 
     test "Not found document error when pending document", %{conn: conn} do
       conn = put_req_header(conn, "x-user-id", "1")
 
-      conn =
-        put(conn, Routes.document_path(conn, :approve, -1, :pending))
+      conn = put(conn, Routes.document_path(conn, :approve, -1, :pending))
 
       assert %{"errors" => %{"detail" => "Not Found"}} == json_response(conn, 404)
     end

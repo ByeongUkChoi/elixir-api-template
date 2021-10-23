@@ -75,7 +75,7 @@ defmodule ApprovalWeb.DocumentControllerTest do
         "title" => "some title",
         "content" => "some content",
         "drafterOpinion" => "some drafter_opinion",
-        "approvalLines" => [%{"sequence" => 1, "approver_id" => approver_id}]
+        "approvalLines" => [%{"sequence" => 1, "approverId" => approver_id}]
       }
 
       # when
@@ -95,8 +95,10 @@ defmodule ApprovalWeb.DocumentControllerTest do
                "sequence" => 1,
                "actedAt" => nil,
                "opinion" => nil,
-               "receivedAt" => nil
+               "receivedAt" => received_at
              } = hd(response["approvalLines"])
+
+      refute is_nil(received_at)
     end
   end
 

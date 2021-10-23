@@ -23,9 +23,26 @@ defmodule Approval.Documents do
   문서를 기안한다.
   """
   def draft_document(attrs \\ %{}) do
-    Document.insert_changeset(attrs)
+    attrs
+    |> set_received_at_to_first_approval_line(NaiveDateTime.local_now())
+    |> Document.insert_changeset()
     |> Repo.insert()
   end
+
+  defp set_received_at_to_first_approval_line(
+         %{approval_lines: [first_approval_line | other_approval_lines]} = attrs,
+         received_at
+       ) do
+    first_approval_line_with_received_at = Map.put(first_approval_line, :received_at, received_at)
+
+    Map.put(
+      attrs,
+      :approval_lines,
+      [first_approval_line_with_received_at] ++ other_approval_lines
+    )
+  end
+
+  defp set_received_at_to_first_approval_line(attrs, _), do: attrs
 
   @doc """
   문서를 승인하다.

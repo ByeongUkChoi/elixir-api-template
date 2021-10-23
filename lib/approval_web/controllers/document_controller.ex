@@ -32,7 +32,14 @@ defmodule ApprovalWeb.DocumentController do
         title: title,
         content: content,
         drafter_opinion: drafter_opinion,
-        approval_lines: approval_lines
+        approval_lines:
+          Enum.map(
+            approval_lines,
+            &%{
+              sequence: Map.get(&1, "sequence"),
+              approver_id: Map.get(&1, "approverId")
+            }
+          )
       })
 
     conn

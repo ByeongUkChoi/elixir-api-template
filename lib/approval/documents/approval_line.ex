@@ -6,7 +6,6 @@ defmodule Approval.Documents.ApprovalLine do
   alias Approval.Documents.Document
 
   schema "approval_lines" do
-    # field :document_id, :id
     field :sequence, :integer
     field :approver_id, :integer
     field :approval_type, Enum, values: [:PENDING, :CONFIRMED, :REJECTED]

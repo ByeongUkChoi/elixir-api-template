@@ -79,9 +79,11 @@ defmodule Approval.DocumentsTest do
                drafter_opinion: "some drafter_opinion",
                status: :ON_PROGRESS,
                approval_lines: [
-                 %{sequence: 1, approver_id: 11, received_at: ~N[2000-01-01 23:00:07]}
+                 %{sequence: 1, approver_id: 11, received_at: received_at}
                ]
              } = document
+
+      refute is_nil(received_at)
     end
 
     test "confirm/3 document without remaining approval line" do
